@@ -1,0 +1,41 @@
+name: Epic
+description: High level architectural or milestone sized work item.
+title: "[EPIC]: "
+labels:
+
+- "type: epic"
+
+body:
+
+- type: markdown
+  attributes:
+  value: |
+    Use Epics for milestone sized work items.
+
+- type: input
+  id: milestone
+  attributes:
+    label: Milestone
+    description: Which milestone does this Epic belong to?
+  validations:
+    required: true
+
+- type: textarea
+  id: description
+  attributes:
+    label: Description
+  validations:
+    required: true
+
+- type: textarea
+  id: deliverables
+  attributes:
+    label: Deliverables
+    description: What should be completed when this Epic is done?
+  validations:
+    required: true
+
+- type: textarea
+  id: child_issues
+  attributes:
+    label: Suggested Child Issues

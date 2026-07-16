@@ -1,0 +1,23 @@
+---
+name: Documentation
+description: Documentation improvements or additions.
+title: "[DOCS]: "
+labels:
+
+- "type: documentation"
+
+body:
+
+- type: input
+  id: document
+  attributes:
+    label: Document Name
+  validations:
+    required: true
+
+- type: textarea
+  id: proposed_change
+  attributes:
+    label: Proposed Change
+  validations:
+    required: true

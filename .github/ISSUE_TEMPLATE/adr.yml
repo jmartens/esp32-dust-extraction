@@ -1,0 +1,28 @@
+---
+name: ADR Proposal
+description: Propose an architectural change.
+title: "[ADR]: "
+labels:
+
+- "type: adr"
+
+body:
+
+- type: textarea
+  id: problem_statement
+  attributes:
+    label: Problem Statement
+  validations:
+    required: true
+
+- type: textarea
+  id: proposal
+  attributes:
+    label: Proposed Architectural Decision
+  validations:
+    required: true
+
+- type: textarea
+  id: affected_specifications
+  attributes:
+    label: Affected Specifications
