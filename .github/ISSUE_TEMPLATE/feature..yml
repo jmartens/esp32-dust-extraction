@@ -1,0 +1,39 @@
+---
+name: Feature
+description: New functionality or implementation task.
+title: "[FEATURE]: "
+labels:
+
+- "type: feature"
+
+body:
+
+- type: input
+  id: component
+  attributes:
+  label: Component
+  validations:
+  required: true
+
+- type: textarea
+  id: description
+  attributes:
+  label: Description
+  validations:
+  required: true
+
+- type: textarea
+  id: acceptance_criteria
+  attributes:
+  label: Acceptance Criteria
+  validations:
+  required: true
+
+- type: checkboxes
+  id: architecture
+  attributes:
+  label: Architecture Compliance
+  options:
+  - label: I have reviewed the specifications.
+  - label: I have reviewed the relevant ADRs.
+  - label: This change does not introduce architectural changes.
