@@ -575,15 +575,4 @@ git push origin feature/my-feature
 ✅ **Transport Independent**: Business logic decoupled from ESP-NOW/HTTP  
 ✅ **Hardware Independent**: Test without ESP32 hardware  
 ✅ **Layered Architecture**: Strict separation of domain/information/resource/interface/transport  
-✅ **Friendly Names as Metadata**: UIDs are primary keys; names for display only  
-
----
-
-## Next Steps
-
-1. **Create CI workflows** (`.github/workflows/`)
-2. **Create helper scripts** (`tools/scripts/`)
-3. **Initialize component structure** with `CMakeLists.txt` templates
-4. **Set up branch protection** on `main`
-5. **Configure semantic-release** (`.releaserc.json`)
-6. **Begin firmware implementation** following ADRs and specifications
+✅ **Friendly Names as Metadata**: UIDs are primary keys; names for display only
