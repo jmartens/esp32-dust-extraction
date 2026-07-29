@@ -1,85 +1,218 @@
-# Development Roadmap
+# OpenExtraction Roadmap
 
-## Phase 0
+## Purpose
 
-Repository
+This document describes the planned evolution of OpenExtraction.
 
-Documentation
+The roadmap is intended to communicate implementation priorities and
+provide contributors with a high-level understanding of the expected
+delivery sequence.
 
-Architecture
+The roadmap is intentionally iterative. Future milestones MAY be
+adjusted based on workshop validation and operational experience.
 
-Protocols
+---
 
-Configuration
+## Guiding Principles
 
-## Phase 1
+OpenExtraction prioritizes:
 
-Shared library
+* Determinism
+* Testability
+* Transport independence
+* Hardware independence
+* Maintainability
+* Extensibility
 
-Device identity
+A working system is preferred over premature feature completeness.
 
-Logging
+---
 
-Configuration parser
+## Milestone Strategy
 
-Message protocol
+The project follows an incremental approach:
 
-ESP-NOW abstraction
+1. Repository Bootstrap
+2. First Dust
+3. Automatic Extraction
+4. Workshop MVP
+5. Future Enhancements
 
-## Phase 2
+Each milestone SHALL deliver a usable system.
 
-Extraction engine
+---
 
-Collector state machine
+## v0.0.1 - Repository Bootstrap
 
-Gate manager
+### Goal
 
-Machine registry
+Establish the repository, architecture and development practices.
 
-## Phase 3
+### Deliverables
 
-Embedded Web UI
+* Repository structure
+* Documentation framework
+* ADR framework
+* GitHub templates
+* CI/CD pipelines
+* Coding standards
+* CONTRIBUTING.md
+* ARCHITECTURE.md
+* COPILOT.md
 
-Device discovery
+### Result
 
-Pairing
+A maintainable, contributor-friendly repository.
 
-Configuration editor
+---
 
-## Phase 4
+## v0.1.0 - First Dust
 
-Machine firmware
+### Goal
 
-Current sensing
+Deliver the first operational prototype.
 
-Manual override
+### Deliverables
 
-Heartbeat
+#### Event System
 
-## Phase 5
+* Event base class
+* Event Dispatcher
+* Command base class
+* Command Dispatcher
 
-Gate firmware
+#### Collector Service
 
-Relay
+* Collector State Machine
+* StartCollector command
+* StopCollector command
+* CollectorStarted event
+* CollectorStopped event
 
-Servo
+#### Collector Unit
 
-Limit switches
+* Collector Unit interface
+* Relay abstraction
+* ESP32 relay implementation
 
-Fault handling
+#### HTTP Interface
 
-## Phase 6
+* Minimal HTTP server
+* Collector API
+* Minimal HTML interface
 
-Security
+### Result
 
-OTA
+The dust collector can be started and stopped remotely.
 
-Diagnostics
+---
 
-Native unit testing
+## v0.2.0 - Automatic Extraction
 
-Release Candidate
+### Goal
 
-## Version 1.0
+Provide automatic dust extraction.
 
-Stable release
+### Deliverables
+
+#### Machine Demand Detection
+
+* IMachineDemandSource
+* ESP32 ADC abstraction
+* Current Transformer abstraction
+* RMS current calculation
+* Demand threshold evaluation
+* Demand debounce support
+* Current transformer calibration
+* Current transformer test fixture
+* MachineDemandStarted event
+* MachineDemandStopped event
+
+#### Collector Automation
+
+* Collector run-on timer
+* Collector start delay
+* Demand aggregation
+* Automatic collector control
+* Manual override support
+* Collector fault handling
+
+### Result
+
+The operator can switch on a machine and observe the dust collector
+starting automatically.
+
+---
+
+## v0.3.0 - Workshop MVP
+
+### Goal
+
+Support multiple machines and establish the Workshop model.
+
+### Planned Areas
+
+* Workshop model
+* Device model
+* Unit model
+* Capability model
+* Multiple machine support
+* Concurrent demand handling
+* Safety mechanisms
+* Watchdog support
+* Fault propagation
+* Diagnostics
+
+### Result
+
+OpenExtraction becomes suitable for daily workshop use.
+
+---
+
+## Future Milestones
+
+Potential future milestones include:
+
+* Blast gate support
+* Route management
+* OTA firmware updates
+* Device discovery
+* Pairing workflows
+* Security improvements
+* Web UI enhancements
+* Diagnostics dashboard
+* Historical telemetry
+* Multi-controller support
+
+Future milestones remain intentionally undefined.
+
+---
+
+## Roadmap Notes
+
+Milestones v0.3.0 and beyond intentionally remain less detailed until
+v0.1.0 and v0.2.0 have been validated in a real workshop.
+
+Real-world experience is expected to influence future requirements,
+particularly in the areas of:
+
+* Machine profiles
+* Fault handling
+* Diagnostics
+* Safety requirements
+* Manual override semantics
+* Workshop topology
+* Routing behavior
+
+---
+
+## Definition of Success
+
+OpenExtraction is considered successful when:
+
+1. A machine can request extraction.
+2. The Controller makes all operational decisions.
+3. The collector operates automatically.
+4. Multiple machines are supported.
+5. The system remains deterministic and testable.
+6. Workshop operation becomes more convenient and safer.
