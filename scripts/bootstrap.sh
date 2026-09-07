@@ -109,14 +109,26 @@ ensure_epics
 # Execute milestone scripts
 ###############################################################################
 
-for script in \
-    "${SCRIPT_DIR}"/milestones/v*.sh
-do
+for script in "${SCRIPT_DIR}"/milestones/v*.sh; do
 
     info "Executing $(basename "$script")"
 
-    # shellcheck source=/dev/null
-    source "$script"
+    # Run each milestone inside a single child bash process that loads the
+    # helper scripts and then sources the milestone file in the same process.
+    # This ensures heredoc stdin attached to the milestone is consumed by the
+    # same shell that has the helper functions available.
+    bash -c "
+        set -Eeuo pipefail
+        DRY_RUN='${DRY_RUN:-false}'
+        UPDATE_EXISTING='${UPDATE_EXISTING:-false}'
+        VERBOSE='${VERBOSE:-false}'
+        source '${SCRIPT_DIR}/common.sh'
+        source '${SCRIPT_DIR}/labels.sh'
+        source '${SCRIPT_DIR}/milestones.sh'
+        source '${SCRIPT_DIR}/epics.sh'
+        # shellcheck disable=SC1090
+        source '${script}'
+    " || true
 
 done
 
