@@ -26,13 +26,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Detect tracked C/C++ sources
+        id: sources
+        shell: bash
+        run: |
+          if git ls-files '*.c' '*.cc' '*.cpp' '*.cxx' '*.h' '*.hh' '*.hpp' '*.hxx' | grep -q .; then
+            echo "has_cpp=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_cpp=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Initialize CodeQL
+        if: steps.sources.outputs.has_cpp == 'true'
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
           build-mode: none
 
       - name: Perform CodeQL analysis
+        if: steps.sources.outputs.has_cpp == 'true'
         uses: github/codeql-action/analyze@v3
         with:
           category: /language:${{ matrix.language }}
