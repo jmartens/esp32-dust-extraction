@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  repository-validation:
+    name: Repository validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install pre-commit
+        run: python -m pip install pre-commit
+
+      - name: Run pre-commit checks
+        run: pre-commit run --all-files
+
+  documentation:
+    name: Documentation validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install pre-commit
+        run: python -m pip install pre-commit
+
+      - name: Validate YAML
+        run: pre-commit run yamllint --all-files
+
+      - name: Validate Markdown
+        run: pre-commit run markdownlint-cli2 --all-files
+
+  build:
+    name: Build readiness
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for a committed build system
+        shell: bash
+        run: |
+          if git ls-files | grep -E '(^|/)(CMakeLists\.txt|platformio\.ini|Makefile|pom\.xml|package\.json)$' | grep -q .; then
+            echo "A build manifest is present. A project-specific build job should be enabled here."
+          else
+            echo "No build manifest is committed yet; firmware build validation is deferred."
+          fi
