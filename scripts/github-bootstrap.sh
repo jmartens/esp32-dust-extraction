@@ -1,6 +1,6 @@
-# scripts/bootstrap-github.sh
-
 #!/usr/bin/env bash
+
+# scripts/bootstrap-github.sh
 
 set -euo pipefail
 
@@ -18,7 +18,7 @@ create_label() {
 
 create_milestone() {
     echo "Create milestone: $1"
-    gh api repos/$REPO/milestones \
+    gh api repos/"$REPO"/milestones \
         --method POST \
         -f title="$1" >/dev/null 2>&1 || true
 }
@@ -1043,7 +1043,7 @@ EOF
 
 echo "Bootstrap complete through v0.2.0."
 echo "OpenExtraction should now be capable of capturing First Dust."
-exit()
+exit 0
 ###############################################################################
 # Milestone: v0.3.0 - Multi-Machine Workshop MVP
 ###############################################################################
@@ -1104,7 +1104,7 @@ create_issue "Implement safe shutdown handling" "feature"
 create_issue "Implement watchdog support" "feature"
 create_issue "Implement fault propagation" "feature"
 
-exit()
+exit 0
 
 ###############################################################################
 # Milestone: v0.4.0 - Multi-Unit Device Model
