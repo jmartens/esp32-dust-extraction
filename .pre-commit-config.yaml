@@ -20,6 +20,6 @@ repos:
       - id: clang-format
 
   - repo: https://github.com/cmake-lint/cmake-lint
-    rev: 1.4.2
+    rev: 1.4.3
     hooks:
       - id: cmakelint
