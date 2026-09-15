@@ -2,6 +2,10 @@
 
 Describe the change.
 
+## Issue
+
+Closes #
+
 ---
 
 ## Type of Change
@@ -25,6 +29,8 @@ Describe the change.
 * [ ] Tests added or updated.
 * [ ] CI passes.
 * [ ] This PR leaves the repository in a releasable state.
+* [ ] This PR is ready to be merged with **Rebase and merge**.
+* [ ] The source branch may be deleted after merge.
 
 ---
 
