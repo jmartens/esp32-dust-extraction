@@ -49,14 +49,8 @@ The system continues to operate when Wi-Fi or Home Assistant is unavailable.
 
 ## Repository Structure
 
-```
-docs/
-firmware/
-ui/
-config/
-schemas/
-tools/
-```
+See [REPOSITORY_LAYOUT.md](REPOSITORY_LAYOUT.md) for the repository structure,
+architecture constraints, development workflow, and planned areas.
 
 ## Status
 
