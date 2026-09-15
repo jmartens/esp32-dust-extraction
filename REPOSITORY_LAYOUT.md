@@ -567,15 +567,15 @@ git push origin feature/my-feature
 
 ## Architecture Principles Summary
 
-✅ **Architecture First**: Documentation → Design → Implementation  
-✅ **Controller Authority**: Controller is sole decision maker  
-✅ **Configuration Ownership**: Controller owns all configuration  
-✅ **Immutable Identity**: Device UID (full MAC) never changes  
-✅ **Event Driven**: All async interactions through events/commands  
-✅ **Transport Independent**: Business logic decoupled from ESP-NOW/HTTP  
-✅ **Hardware Independent**: Test without ESP32 hardware  
-✅ **Layered Architecture**: Strict separation of domain/information/resource/interface/transport  
-✅ **Friendly Names as Metadata**: UIDs are primary keys; names for display only  
+✅ **Architecture First**: Documentation → Design → Implementation
+✅ **Controller Authority**: Controller is sole decision maker
+✅ **Configuration Ownership**: Controller owns all configuration
+✅ **Immutable Identity**: Device UID (full MAC) never changes
+✅ **Event Driven**: All async interactions through events/commands
+✅ **Transport Independent**: Business logic decoupled from ESP-NOW/HTTP
+✅ **Hardware Independent**: Test without ESP32 hardware
+✅ **Layered Architecture**: Strict separation of domain/information/resource/interface/transport
+✅ **Friendly Names as Metadata**: UIDs are primary keys; names for display only
 
 ---
 
