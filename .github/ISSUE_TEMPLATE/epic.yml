@@ -9,8 +9,8 @@ body:
 
 - type: markdown
   attributes:
-  value: |
-    Use Epics for milestone sized work items.
+    value: |
+      Use Epics for milestone sized work items.
 
 - type: input
   id: milestone
