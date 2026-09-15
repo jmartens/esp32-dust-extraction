@@ -46,3 +46,8 @@ repos:
         stages: [manual]
       - id: cppcheck
         stages: [manual]
+
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 44.91.0
+    hooks:
+      - id: renovate-config-validator
