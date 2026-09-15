@@ -1,4 +1,4 @@
-# ADR-0014:     
+# ADR-0014:
 
 **Status:** Accepted
 

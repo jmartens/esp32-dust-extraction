@@ -724,7 +724,7 @@ Event identifiers SHALL remain stable across protocol revisions.
 
 Identifiers SHALL be grouped like below:
 
-Event types | Address range 
+Event types | Address range
 |---:|---|
 Machine Events | 0x1000-0x10FF
 Gate Events | 0x1100-0x11FF
@@ -939,4 +939,3 @@ Business Messages SHALL satisfy the following principles.
 - Payloads are versioned.
 - Duplicate Commands SHALL be ignored.
 - Business logic remains independent of transport.
-

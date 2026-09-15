@@ -43,7 +43,7 @@ create_issue() {
 
         return
     fi
-	
+
     echo "Create issue: $title ($label)"
 
     gh issue create \
@@ -1043,7 +1043,7 @@ EOF
 
 echo "Bootstrap complete through v0.2.0."
 echo "OpenExtraction should now be capable of capturing First Dust."
-exit() 
+exit()
 ###############################################################################
 # Milestone: v0.3.0 - Multi-Machine Workshop MVP
 ###############################################################################
@@ -1161,7 +1161,7 @@ gh issue create \
 gh issue create \
     --title "Implement DeviceOffline event" \
     --label "feature"
-	
+
 ###############################################################################
 # Milestone: v0.5.0 - Configuration & Persistence
 ###############################################################################
@@ -1229,7 +1229,7 @@ gh issue create \
 gh issue create \
     --title "Implement pairing security checks" \
     --label "feature"
-	
+
 ###############################################################################
 # Milestone: v0.6.0 - Web API & Web UI
 ###############################################################################
@@ -1289,7 +1289,7 @@ gh issue create \
 gh issue create \
     --title "Implement Diagnostics UI" \
     --label "feature"
-	
+
 ###############################################################################
 # Milestone: v0.7.0+ (Routing, Automation, Diagnostics)
 ###############################################################################
@@ -1349,4 +1349,3 @@ gh issue create \
 gh issue create \
     --title "Publish v1.0.0" \
     --label "feature"
-	

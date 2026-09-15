@@ -358,7 +358,7 @@ Recursive event processing MUST NOT occur.
 
 ---
 
-### REQ-EVT-005 
+### REQ-EVT-005
 Events SHALL be processed in FIFO order unless explicitly prioritised.
 
 ---
@@ -407,7 +407,7 @@ Business logic SHALL NOT directly access transport layers.
 ---
 
 ### REQ-AECH-005
-The systen SHALL support multiple logical units by a single Physical Device.
+The system SHALL support multiple logical units by a single Physical Device.
 
 ---
 
