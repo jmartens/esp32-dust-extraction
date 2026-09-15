@@ -49,19 +49,3 @@ jobs:
 
       - name: Validate Markdown
         run: pre-commit run markdownlint-cli2 --all-files
-
-  build:
-    name: Build readiness
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Check for a committed build system
-        shell: bash
-        run: |
-          if git ls-files | grep -E '(^|/)(CMakeLists\.txt|platformio\.ini|Makefile|pom\.xml|package\.json)$' | grep -q .; then
-            echo "A build manifest is present. A project-specific build job should be enabled here."
-          else
-            echo "No build manifest is committed yet; firmware build validation is deferred."
-          fi
