@@ -11,9 +11,29 @@ permissions:
   contents: read
 
 jobs:
+  detect:
+    name: Detect firmware build system
+    runs-on: ubuntu-latest
+    outputs:
+      has_build: ${{ steps.build-system.outputs.has_build }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for firmware build manifest
+        id: build-system
+        shell: bash
+        run: |
+          if test -f firmware/CMakeLists.txt; then
+            echo "has_build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_build=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
     name: Build ESP-IDF firmware
-    if: hashFiles('firmware/CMakeLists.txt') != ''
+    needs: detect
+    if: needs.detect.outputs.has_build == 'true'
     runs-on: ubuntu-latest
     container:
       image: espressif/idf:v5.3
@@ -27,7 +47,8 @@ jobs:
 
   not-configured:
     name: Build system not configured
-    if: hashFiles('firmware/CMakeLists.txt') == ''
+    needs: detect
+    if: needs.detect.outputs.has_build == 'false'
     runs-on: ubuntu-latest
     steps:
       - name: Explain deferred build
