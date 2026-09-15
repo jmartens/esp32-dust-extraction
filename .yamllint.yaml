@@ -1,0 +1,11 @@
+---
+extends: default
+
+rules:
+  document-start: disable
+  indentation: disable
+  line-length: disable
+  new-lines: disable
+  new-line-at-end-of-file: disable
+  truthy:
+    check-keys: false
