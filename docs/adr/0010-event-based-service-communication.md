@@ -16,7 +16,7 @@ As the Controller evolves, it is responsible for multiple independent domains, i
 
 Implementing these domains as tightly coupled modules that directly invoke one another's behaviour would increase complexity, reduce maintainability and make testing difficult.
 
-The project has already adopted an event-driven Controller core (ADR-0008) and separate Event and Command buses (ADR-0009). A communication model between services is therefore required.
+The project has already adopted an event-driven Controller core ([ADR-0008](0008-event-driven-controller-core.md)) and separate Event and Command buses ([ADR-0009](0009-separate-event-bus-and-command-bus.md)). A communication model between services is therefore required.
 
 ## Decision
 
