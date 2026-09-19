@@ -118,7 +118,7 @@ The Controller SHALL create the corresponding logical representation for every d
 
 ## Resource Namespace
 
-The hierarchical resource namespace defined by ADR-0012 SHALL distinguish Physical Devices from Units.
+The hierarchical resource namespace defined by [ADR-0012](0012-controller-owned-resource-namespace.md) SHALL distinguish Physical Devices from Units.
 
 Illustrative examples include:
 
