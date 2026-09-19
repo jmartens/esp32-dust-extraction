@@ -2,7 +2,7 @@ Release automation (semantic-release)
 
 What this adds
 - .releaserc.json: semantic-release configuration to analyze Conventional Commits, generate release notes, update CHANGELOG.md, tag releases, and create GitHub Releases.
-- .github/workflows/release.yml: GitHub Actions workflow that runs semantic-release on pushes to the default branch (develop) and on manual dispatch.
+- .github/workflows/release.yml: GitHub Actions workflow that runs semantic-release on pushes to branches (main, hotfix/*, release/*, develop) and on manual dispatch.
 
 Enabling the automation
 1. By default the workflow uses the repository's GITHUB_TOKEN. For commit and tag pushes created by semantic-release, the workflow needs write access to repository contents.
