@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+        run: |
+          # prefer a user-provided RELEASE_GITHUB_TOKEN; fallback to built-in GITHUB_TOKEN
+          export GITHUB_TOKEN="${RELEASE_GITHUB_TOKEN:-$GITHUB_TOKEN}"
+
+          # Use npx to avoid committing package.json; install ephemeral packages as needed
+          npx -y semantic-release
