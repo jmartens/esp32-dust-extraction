@@ -7,7 +7,7 @@
 namespace open_extraction::esp_relay_driver {
 
 EspRelayDriver::EspRelayDriver(const EspRelayConfig config) : config_(config) {
-  const gpio_config_t gpio_config{
+  const gpio_config_t gpio_configuration{
       .pin_bit_mask = 1ULL << static_cast<std::uint32_t>(config_.gpio_pin),
       .mode = GPIO_MODE_OUTPUT,
       .pull_up_en = GPIO_PULLUP_DISABLE,
@@ -15,7 +15,7 @@ EspRelayDriver::EspRelayDriver(const EspRelayConfig config) : config_(config) {
       .intr_type = GPIO_INTR_DISABLE,
   };
 
-  ESP_ERROR_CHECK(gpio_config(&gpio_config));
+  ESP_ERROR_CHECK(gpio_config(&gpio_configuration));
   off();
 }
 
