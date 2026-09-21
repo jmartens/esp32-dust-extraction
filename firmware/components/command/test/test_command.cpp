@@ -20,7 +20,8 @@ using open_extraction::command::Timestamp;
 
 class TestCommand final : public Command {
 public:
-  explicit TestCommand(CommandMetadata metadata) : Command(std::move(metadata)) {}
+  explicit TestCommand(CommandMetadata metadata)
+      : Command(std::move(metadata)) {}
 
   [[nodiscard]] SerializedPayload serialize_payload() const override {
     return {0x01, 0x02};
@@ -31,8 +32,7 @@ CommandMetadata valid_metadata() {
   const auto command_id =
       CommandId::from_string("ea290ba8-5255-4c7f-9fc6-9a1b94d5a742").value();
   const auto command_type = CommandType::from_string("gate.open").value();
-  const auto target =
-      DeviceUid::from_string("GATE-58BF25A77109").value();
+  const auto target = DeviceUid::from_string("GATE-58BF25A77109").value();
 
   return {
       .id = command_id,
@@ -61,7 +61,8 @@ TEST_CASE("a command exposes immutable metadata", "[command]") {
                           command.timestamp().time_since_epoch().count());
 }
 
-TEST_CASE("a command serializes its payload through its boundary", "[command]") {
+TEST_CASE("a command serializes its payload through its boundary",
+          "[command]") {
   const TestCommand command(valid_metadata());
   constexpr std::array<std::uint8_t, 2> expected_payload = {0x01, 0x02};
 
@@ -76,7 +77,8 @@ TEST_CASE("a command can be copied and moved", "[command]") {
   const TestCommand copy = original;
   TestCommand moved = std::move(copy);
 
-  TEST_ASSERT_EQUAL_STRING(original.command_id().data(), moved.command_id().data());
+  TEST_ASSERT_EQUAL_STRING(original.command_id().data(),
+                           moved.command_id().data());
   TEST_ASSERT_EQUAL_STRING(original.command_type().data(),
                            moved.command_type().data());
   TEST_ASSERT_EQUAL_STRING(original.target().data(), moved.target().data());

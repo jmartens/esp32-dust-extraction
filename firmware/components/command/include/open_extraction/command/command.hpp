@@ -30,7 +30,8 @@ private:
 
 class CommandType {
 public:
-  [[nodiscard]] static std::optional<CommandType> from_string(std::string value);
+  [[nodiscard]] static std::optional<CommandType>
+  from_string(std::string value);
 
   [[nodiscard]] std::string_view value() const noexcept;
 
