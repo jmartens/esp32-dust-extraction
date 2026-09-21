@@ -9,8 +9,8 @@ namespace open_extraction::event_json {
 
 class EventJsonCodec {
 public:
-    [[nodiscard]] static std::optional<std::string> serialize(
-        const event::Event& event);
+  [[nodiscard]] static std::optional<std::string>
+  serialize(const event::Event &event);
 };
 
-}  // namespace open_extraction::event_json
+} // namespace open_extraction::event_json
