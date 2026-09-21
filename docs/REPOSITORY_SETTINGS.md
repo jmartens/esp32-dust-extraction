@@ -152,9 +152,9 @@ This PR adds documentation only. A repository admin must apply the settings via 
 ---
 
 ## References
-- GitHub branch protection docs: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-protected-branches
-- GitHub REST API: Branch protection: https://docs.github.com/en/rest/branches/branch-protection
-- GitHub Actions Secrets: https://docs.github.com/en/actions/security-guides/encrypted-secrets
+- GitHub branch protection docs: [Configuring protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-protected-branches)
+- GitHub REST API: Branch protection: [Branch protection REST API](https://docs.github.com/en/rest/branches/branch-protection)
+- GitHub Actions Secrets: [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
 
 ---
 
