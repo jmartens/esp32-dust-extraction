@@ -6,7 +6,7 @@ namespace open_extraction::event_id_generator {
 
 class EspEventIdGenerator final : public event::EventIdGenerator {
 public:
-    [[nodiscard]] event::EventId generate() override;
+  [[nodiscard]] event::EventId generate() override;
 };
 
-}  // namespace open_extraction::event_id_generator
+} // namespace open_extraction::event_id_generator
