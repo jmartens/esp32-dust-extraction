@@ -14,7 +14,7 @@ std::optional<CommandId> CommandId::from_string(std::string value) {
     return std::nullopt;
   }
 
-  return CommandId(std::move(*event_id));
+  return CommandId(*event_id);
 }
 
 CommandId::CommandId(event::EventId id) : id_(std::move(id)) {}
