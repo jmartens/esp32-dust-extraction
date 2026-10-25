@@ -1,5 +1,5 @@
 idf_component_register(
     SRCS "src/event_json_codec.cpp"
     INCLUDE_DIRS "include"
-    REQUIRES cjson event
+    REQUIRES cjson collector_events event
 )

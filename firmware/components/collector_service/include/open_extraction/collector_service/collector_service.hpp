@@ -7,6 +7,7 @@
 #include "open_extraction/collector_api/collector_api.hpp"
 #include "open_extraction/command_dispatcher/command_dispatcher.hpp"
 #include "open_extraction/event/event.hpp"
+#include "open_extraction/event_dispatcher/event_dispatcher.hpp"
 
 namespace open_extraction::collector_service {
 
@@ -20,6 +21,7 @@ class CollectorService final : public collector_api::ICollectorControl {
 public:
   // All references must outlive the service.
   CollectorService(command_dispatcher::CommandDispatcher &dispatcher,
+                   event_dispatcher::EventDispatcher &event_dispatcher,
                    const collector_unit::ICollectorUnit &unit,
                    event::DeviceUid device_uid,
                    event::EventIdGenerator &id_generator, Clock clock);
@@ -33,10 +35,15 @@ public:
   [[nodiscard]] bool request_start() override;
   [[nodiscard]] bool request_stop() override;
 
+  // Publishes a CollectorFault Domain Event. State handling remains the
+  // responsibility of the service that consumes the event.
+  void report_fault(std::string reason);
+
 private:
   template <typename CommandT> [[nodiscard]] bool dispatch_command() const;
 
   command_dispatcher::CommandDispatcher &dispatcher_;
+  event_dispatcher::EventDispatcher &event_dispatcher_;
   const collector_unit::ICollectorUnit &unit_;
   event::DeviceUid device_uid_;
   event::EventIdGenerator &id_generator_;

@@ -146,7 +146,12 @@ Examples:
 
 - CollectorStarted
 - CollectorStopped
-- CollectorFault
+
+`CollectorFault` SHALL include an immutable `reason` string describing the
+business-significant fault. Its event representation SHALL serialize this
+field as `reason`. The owning Collector Service SHALL publish the event when
+reporting a collector fault; consuming the event and updating state remain
+separate responsibilities.
 
 ---
 
@@ -154,6 +159,7 @@ Examples:
 
 Examples:
 
+- CollectorFault
 - RouteActivated
 - RouteDeactivated
 - AllRequiredGatesOpen

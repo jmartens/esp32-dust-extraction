@@ -131,4 +131,8 @@ std::string_view Event::originating_device() const noexcept {
   return metadata_.originating_device.value();
 }
 
+std::optional<std::string_view> Event::fault_reason() const noexcept {
+  return std::nullopt;
+}
+
 } // namespace open_extraction::event

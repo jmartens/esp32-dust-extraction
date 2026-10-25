@@ -4,8 +4,10 @@ idf_component_register(
     REQUIRES
         collector_api
         collector_commands
+        collector_events
         collector_unit
         command
         command_dispatcher
         event
+        event_dispatcher
 )

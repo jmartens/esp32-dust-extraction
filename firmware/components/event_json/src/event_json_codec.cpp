@@ -30,6 +30,14 @@ EventJsonCodec::serialize(const event::Event &event) {
     return std::nullopt;
   }
 
+  if (const auto reason = event.fault_reason(); reason.has_value()) {
+    const std::string reason_string(*reason);
+    if (cJSON_AddStringToObject(json.get(), "reason", reason_string.c_str()) ==
+        nullptr) {
+      return std::nullopt;
+    }
+  }
+
   std::unique_ptr<char, decltype(&cJSON_free)> serialized(
       cJSON_PrintUnformatted(json.get()), cJSON_free);
   if (!serialized) {

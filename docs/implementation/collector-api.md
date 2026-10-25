@@ -52,6 +52,10 @@ concrete `ICollectorControl` the API depends on. It:
 - never changes state itself. Transitions happen only when the command
   recipient handles the command and the resulting events are processed
   ([ADR-0009](../adr/0009-separate-event-bus-and-command-bus.md)).
+- publishes an immutable `CollectorFault` Domain Event through the
+  `EventDispatcher` when `report_fault(reason)` is called. The event includes
+  its reason in JSON serialization; state handling remains with event
+  consumers.
 
 Routing HTTP to `CollectorApi` and the startup wiring are described in
 [HTTP Server](http-server.md).

@@ -74,6 +74,11 @@ Examples include:
 
 Faults SHALL be immutable.
 
+`CollectorFault` SHALL include an immutable reason describing the
+business-significant fault. Implementation-specific error details SHALL NOT
+be exposed as the reason unless they have been explicitly elevated to a
+domain Fault.
+
 ---
 
 # Fault Ownership
