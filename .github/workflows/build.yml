@@ -67,6 +67,9 @@ jobs:
     needs: detect
     if: needs.detect.outputs.has_build == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -106,3 +109,32 @@ jobs:
         with:
           name: host-test-coverage
           path: firmware/test/coverage/
+
+      - name: Comment coverage on pull request
+        if: >-
+          always() && github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          hashFiles('firmware/test/coverage/summary.txt') != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          marker='<!-- host-test-coverage -->'
+          {
+            echo "$marker"
+            echo '## Host unit-test coverage'
+            echo '```'
+            cat firmware/test/coverage/summary.txt
+            echo '```'
+            echo "Full HTML/XML report: \`host-test-coverage\` artifact on the [workflow run]($RUN_URL)."
+          } > comment.md
+          comment_id="$(gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
+            --jq "[.[] | select(.user.login == \"github-actions[bot]\" and (.body | contains(\"$marker\")))][0].id // empty" | head -n1)"
+          if [ -n "$comment_id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$comment_id" -F body=@comment.md
+          else
+            gh api -X POST "repos/$REPO/issues/$PR_NUMBER/comments" -F body=@comment.md
+          fi
