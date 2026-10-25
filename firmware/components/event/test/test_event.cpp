@@ -56,6 +56,13 @@ TEST_CASE("an event cannot be assigned after construction", "[event]") {
   TEST_ASSERT_FALSE((std::is_move_assignable_v<TestEvent>));
 }
 
+TEST_CASE("an event can be copied and moved after construction", "[event]") {
+  TEST_ASSERT_TRUE((std::is_copy_constructible_v<Event>));
+  TEST_ASSERT_TRUE((std::is_move_constructible_v<Event>));
+  TEST_ASSERT_TRUE((std::is_copy_constructible_v<TestEvent>));
+  TEST_ASSERT_TRUE((std::is_move_constructible_v<TestEvent>));
+}
+
 TEST_CASE("event metadata rejects malformed identifiers", "[event]") {
   TEST_ASSERT_FALSE(EventId::from_string("not-a-uuid").has_value());
   TEST_ASSERT_FALSE(EventType::from_string("").has_value());
