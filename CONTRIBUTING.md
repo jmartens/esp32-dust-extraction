@@ -273,6 +273,8 @@ persistence/
 
 Business logic shall be testable on desktop platforms.
 
+ESP-IDF builds can use ccache to avoid recompiling unchanged files. Run `idf.py --ccache build`, or set `IDF_CCACHE_ENABLE=1` in the environment before running `idf.py`.
+
 Testing layers are:
 
 ```text
