@@ -7,6 +7,9 @@ set(COLLECTOR_EVENTS_TEST_DIR
 set(COLLECTOR_COMMANDS_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_commands/test"
 )
+set(COLLECTOR_API_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_api/test"
+)
 set(COLLECTOR_STATE_MACHINE_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_state_machine/test"
 )
@@ -32,6 +35,7 @@ idf_component_register(
         "test_main.cpp"
         "${COLLECTOR_EVENTS_TEST_DIR}/test_collector_events.cpp"
         "${COLLECTOR_COMMANDS_TEST_DIR}/test_collector_commands.cpp"
+        "${COLLECTOR_API_TEST_DIR}/test_collector_api.cpp"
         "${COLLECTOR_STATE_MACHINE_TEST_DIR}/test_collector_state_machine.cpp"
         "${COLLECTOR_UNIT_TEST_DIR}/test_collector_unit.cpp"
         "${COMMAND_TEST_DIR}/test_command.cpp"
@@ -43,6 +47,7 @@ idf_component_register(
         "${RELAY_TEST_DIR}/test_relay_driver.cpp"
     PRIV_REQUIRES
         unity
+        collector_api
         collector_commands
         collector_events
         collector_state_machine
