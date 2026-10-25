@@ -4,8 +4,8 @@ idf_component_register(
         collector_api
         collector_commands
         collector_service
-        collector_state_machine
-        collector_unit
+        relay_backed_collector_unit
+        esp_relay_driver
         command_dispatcher
         event
         event_id_generator

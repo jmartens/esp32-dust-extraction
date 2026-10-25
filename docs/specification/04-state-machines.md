@@ -250,7 +250,8 @@ Stopped
 
 ## Stopped
 
-Collector is not operating.
+The Collector Unit's commanded output is off. Without motor-feedback hardware,
+this state does not confirm that the collector motor is physically stopped.
 
 ---
 
@@ -262,7 +263,8 @@ StartCollector Command has been issued.
 
 ## Running
 
-Collector reports operational.
+The Collector Unit's commanded output is on. Without motor-feedback hardware,
+this state does not confirm that the collector motor is physically running.
 
 ---
 

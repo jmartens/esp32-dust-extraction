@@ -13,8 +13,9 @@
 #include "open_extraction/collector_commands/start_collector.hpp"
 #include "open_extraction/collector_commands/stop_collector.hpp"
 #include "open_extraction/collector_service/collector_service.hpp"
-#include "open_extraction/collector_state_machine/collector_state_machine.hpp"
+#include "open_extraction/collector_unit/relay_backed_collector_unit.hpp"
 #include "open_extraction/command_dispatcher/command_dispatcher.hpp"
+#include "open_extraction/esp_relay_driver/esp_relay_driver.hpp"
 #include "open_extraction/event_dispatcher/event_dispatcher.hpp"
 #include "open_extraction/event_id_generator/esp_event_id_generator.hpp"
 #include "open_extraction/http_routes/http_routes.hpp"
@@ -23,35 +24,18 @@
 namespace {
 
 using namespace open_extraction;
+using esp_relay_driver::RelayPolarity;
 
 constexpr const char *kTag = "app_main";
 
-// No hardware-backed collector exists yet, so the unit follows the state
-// machine and confirms transitions immediately.
-class StateMachineUnit final : public collector_unit::ICollectorUnit {
-public:
-  bool start() override {
-    return machine_.request_start() && machine_.confirm_started();
-  }
-  bool stop() override {
-    return machine_.request_stop() && machine_.confirm_stopped();
-  }
-  collector_unit::CollectorState state() const override {
-    return machine_.state();
-  }
-  collector_unit::CollectorDiagnostics diagnostics() const override {
-    return {};
-  }
-  std::span<const collector_unit::CollectorCapability>
-  capabilities() const override {
-    return kCapabilities;
-  }
-
-private:
-  static constexpr std::array kCapabilities = {
-      collector_unit::CollectorCapability::start_stop};
-  collector_state_machine::CollectorStateMachine machine_;
-};
+constexpr RelayPolarity collector_relay_polarity() {
+#if defined(CONFIG_OPEN_EXTRACTION_COLLECTOR_RELAY_ACTIVE_LOW) &&              \
+    CONFIG_OPEN_EXTRACTION_COLLECTOR_RELAY_ACTIVE_LOW
+  return RelayPolarity::active_low;
+#else
+  return RelayPolarity::active_high;
+#endif
+}
 
 std::string device_uid_string() {
   std::array<std::uint8_t, 6> mac{};
@@ -65,7 +49,12 @@ std::string device_uid_string() {
 } // namespace
 
 extern "C" void app_main(void) {
-  static StateMachineUnit unit;
+  static esp_relay_driver::EspRelayDriver relay({
+      .gpio_pin =
+          static_cast<gpio_num_t>(CONFIG_OPEN_EXTRACTION_COLLECTOR_RELAY_GPIO),
+      .polarity = collector_relay_polarity(),
+  });
+  static collector_unit::RelayBackedCollectorUnit unit(relay);
   static command_dispatcher::CommandDispatcher dispatcher;
   static event_dispatcher::EventDispatcher event_dispatcher;
   static event_id_generator::EspEventIdGenerator ids;

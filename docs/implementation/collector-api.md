@@ -26,6 +26,30 @@ should poll `GET /api/v1/collector`.
 ```
 
 `state` is one of `stopped`, `starting`, `running`, `stopping`, `faulted`.
+For the relay-backed Collector Unit, these states describe the commanded
+relay/output state. `running` means the relay has been commanded on; it does
+not confirm that the motor is physically running because no motor-feedback
+sensor is present.
+
+## Relay-backed Collector Unit
+
+The production Collector Unit composes the collector state machine with the
+relay driver. At startup it commands the relay off before accepting commands.
+A permitted start commands the relay on and reports `running`; a permitted
+stop commands it off and reports `stopped`. Requests rejected by the state
+machine do not change the relay output.
+
+Configure the relay under **Open Extraction** in `idf.py menuconfig`:
+
+| Setting | Default | Description |
+| ------- | ------- | ----------- |
+| Collector relay GPIO pin | GPIO 26 | Output pin connected to the relay |
+| Collector relay polarity | Active high | Select active high or active low |
+
+Choose an output-capable pin that is not reserved by the board or flash
+interface. The ESP relay driver presets the GPIO's off level before enabling
+output mode, so active-low relays are not briefly energized during
+initialization.
 
 ## Errors
 
