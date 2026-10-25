@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Restore ESP-IDF ccache
-        uses: actions/cache@0c45773b623bea8c8e75f6c82c208c3cf94ea4f9 # v4.2.4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: .ccache
           key: ${{ runner.os }}-esp32-${{ hashFiles('firmware/**/CMakeLists.txt', 'firmware/**/idf_component.yml', 'firmware/sdkconfig*') }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -72,7 +72,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Restore host-test ESP-IDF ccache
-        uses: actions/cache@0c45773b623bea8c8e75f6c82c208c3cf94ea4f9 # v4.2.4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: .ccache
           key: ${{ runner.os }}-host-${{ hashFiles('firmware/**/CMakeLists.txt', 'firmware/**/idf_component.yml', 'firmware/sdkconfig*') }}-${{ github.run_id }}-${{ github.run_attempt }}
