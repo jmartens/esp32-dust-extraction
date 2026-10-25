@@ -8,4 +8,26 @@ menu "Open Extraction"
             TCP port the collector HTTP interface (control page and
             /api/v1/collector) listens on.
 
+    config OPEN_EXTRACTION_COLLECTOR_RELAY_GPIO
+        int "Collector relay GPIO pin"
+        range 0 33
+        default 26
+        help
+            GPIO output pin connected to the collector relay. Avoid pins
+            reserved for flash or board-specific functions.
+
+    choice OPEN_EXTRACTION_COLLECTOR_RELAY_POLARITY
+        prompt "Collector relay polarity"
+        default OPEN_EXTRACTION_COLLECTOR_RELAY_ACTIVE_HIGH
+        help
+            Select the GPIO level that energizes the collector relay.
+
+        config OPEN_EXTRACTION_COLLECTOR_RELAY_ACTIVE_HIGH
+            bool "Active high"
+
+        config OPEN_EXTRACTION_COLLECTOR_RELAY_ACTIVE_LOW
+            bool "Active low"
+
+    endchoice
+
 endmenu

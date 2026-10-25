@@ -7,6 +7,9 @@
 namespace open_extraction::esp_relay_driver {
 
 EspRelayDriver::EspRelayDriver(const EspRelayConfig config) : config_(config) {
+  const bool off_level = config_.polarity == RelayPolarity::active_low;
+  ESP_ERROR_CHECK(gpio_set_level(config_.gpio_pin, off_level ? 1 : 0));
+
   const gpio_config_t gpio_configuration{
       .pin_bit_mask = 1ULL << static_cast<std::uint32_t>(config_.gpio_pin),
       .mode = GPIO_MODE_OUTPUT,
@@ -16,7 +19,7 @@ EspRelayDriver::EspRelayDriver(const EspRelayConfig config) : config_(config) {
   };
 
   ESP_ERROR_CHECK(gpio_config(&gpio_configuration));
-  off();
+  state_ = relay::RelayState::off;
 }
 
 void EspRelayDriver::on() { set_state(relay::RelayState::on); }
