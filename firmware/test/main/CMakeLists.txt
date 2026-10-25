@@ -28,6 +28,7 @@ set(EVENT_ID_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/event_id_generator/test"
 )
 set(EVENT_JSON_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/event_json/test")
+set(HTTP_SERVER_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/http_server/test")
 set(RELAY_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/relay/test")
 
 idf_component_register(
@@ -44,6 +45,7 @@ idf_component_register(
         "${EVENT_DISPATCHER_TEST_DIR}/test_event_dispatcher.cpp"
         "${EVENT_ID_TEST_DIR}/test_esp_event_id_generator.cpp"
         "${EVENT_JSON_TEST_DIR}/test_event_json_codec.cpp"
+        "${HTTP_SERVER_TEST_DIR}/test_http_server.cpp"
         "${RELAY_TEST_DIR}/test_relay_driver.cpp"
     PRIV_REQUIRES
         unity
@@ -58,6 +60,7 @@ idf_component_register(
         event_dispatcher
         event_id_generator
         event_json
+        http_server
         relay
     WHOLE_ARCHIVE
 )
