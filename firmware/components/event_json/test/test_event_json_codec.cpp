@@ -14,6 +14,7 @@ using open_extraction::event::EventId;
 using open_extraction::event::EventMetadata;
 using open_extraction::event::EventType;
 using open_extraction::event::Timestamp;
+using open_extraction::event_json::EventJsonCodec;
 
 class TestEvent final : public Event {
 public:

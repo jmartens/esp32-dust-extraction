@@ -6,7 +6,8 @@ TEST_CASE("the ESP event ID generator creates UUID version 4 identifiers",
           "[event_id_generator]") {
   open_extraction::event_id_generator::EspEventIdGenerator generator;
 
-  const auto event_id = generator.generate().value();
+  const auto generated_event_id = generator.generate();
+  const auto event_id = generated_event_id.value();
 
   TEST_ASSERT_EQUAL_UINT8('4', event_id[14]);
   TEST_ASSERT_TRUE(event_id[19] == '8' || event_id[19] == '9' ||
