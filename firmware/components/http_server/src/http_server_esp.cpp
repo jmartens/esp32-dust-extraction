@@ -42,7 +42,7 @@ esp_err_t dispatch_request(httpd_req_t *request) {
   const Response response = server->handle({method, request->uri});
   const std::string status =
       std::to_string(response.status) + " " + reason_phrase(response.status);
-  if (httpd_resp_set_type(request, "application/json") != ESP_OK ||
+  if (httpd_resp_set_type(request, response.content_type.c_str()) != ESP_OK ||
       httpd_resp_set_status(request, status.c_str()) != ESP_OK) {
     return ESP_FAIL;
   }

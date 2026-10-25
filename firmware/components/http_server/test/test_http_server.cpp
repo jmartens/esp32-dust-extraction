@@ -67,3 +67,9 @@ TEST_CASE("HTTP server reports that the host target cannot start it",
   TEST_ASSERT_FALSE(server.start().empty());
   TEST_ASSERT_TRUE(server.stop().empty());
 }
+
+TEST_CASE("HTTP responses default to JSON content", "[http_server]") {
+  const Response response{200, "{}"};
+
+  TEST_ASSERT_EQUAL_STRING("application/json", response.content_type.c_str());
+}

@@ -17,6 +17,7 @@ struct Request {
 struct Response {
   int status;
   std::string body;
+  std::string content_type = "application/json";
 };
 
 struct Config {

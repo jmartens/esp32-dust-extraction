@@ -36,3 +36,12 @@ Errors use the body `{ "error": "<message>" }`.
 | 404    | Unknown path                                              |
 | 405    | Method not supported for the path                         |
 | 409    | Request not permitted in the current collector state      |
+
+## HTML control page
+
+`firmware/components/collector_page` provides a self-contained HTML page (no
+external assets) that shows the collector state and Device UID and offers Start
+and Stop actions. It uses only the endpoints above and polls
+`GET /api/v1/collector` every two seconds to show the confirmed state. Serving
+the page (for example at `/`) is the responsibility of the collector service
+wiring, using `Response::content_type = "text/html"`.
