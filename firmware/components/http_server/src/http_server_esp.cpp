@@ -74,7 +74,7 @@ struct Platform {
 
     httpd_uri_t route = {
         .uri = "/*",
-        .method = HTTP_ANY,
+        .method = static_cast<httpd_method_t>(HTTP_ANY),
         .handler = dispatch_request,
         .user_ctx = &server,
     };
