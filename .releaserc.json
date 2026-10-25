@@ -20,6 +20,25 @@
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
-    ["@semantic-release/github"]
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          "dist/esp32-firmware/*.bin",
+          {
+            "path": "dist/esp32-firmware/flash_args",
+            "label": "ESP32 esptool flash arguments"
+          },
+          {
+            "path": "dist/esp32-firmware/manifest.json",
+            "label": "ESP32 firmware manifest"
+          },
+          {
+            "path": "dist/esp32-firmware/README.md",
+            "label": "ESP32 flashing instructions"
+          }
+        ]
+      }
+    ]
   ]
 }

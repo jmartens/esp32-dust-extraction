@@ -28,6 +28,20 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Build ESP32 firmware
+        uses: espressif/esp-idf-ci-action@9d38657f3d789ca759b2b37aaf5ceffbc42c4f0d # v1
+        with:
+          esp_idf_version: v6.1
+          target: esp32
+          path: firmware
+
+      - name: Package flashable firmware
+        run: |
+          python3 scripts/package_esp32_release.py \
+            --build-dir firmware/build \
+            --output-dir dist/esp32-firmware \
+            --commit "$GITHUB_SHA"
+
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -41,5 +55,6 @@ jobs:
             -p semantic-release@22 \
             -p @semantic-release/changelog@6 \
             -p @semantic-release/git@10 \
+            -p @semantic-release/github@9 \
             -p conventional-changelog-conventionalcommits@7 \
             semantic-release
