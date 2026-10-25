@@ -1,0 +1,11 @@
+menu "Open Extraction"
+
+    config OPEN_EXTRACTION_HTTP_PORT
+        int "HTTP server port"
+        range 1 65535
+        default 80
+        help
+            TCP port the collector HTTP interface (control page and
+            /api/v1/collector) listens on.
+
+endmenu
