@@ -67,8 +67,8 @@ class Event {
 public:
   Event(const Event &) = default;
   Event(Event &&) noexcept = default;
-  Event &operator=(const Event &) = default;
-  Event &operator=(Event &&) noexcept = default;
+  Event &operator=(const Event &) = delete;
+  Event &operator=(Event &&) noexcept = delete;
   virtual ~Event() = default;
 
   [[nodiscard]] std::string_view event_id() const noexcept;
