@@ -46,6 +46,23 @@ jobs:
           target: esp32
           path: firmware
 
+  host-tests:
+    name: Run host unit tests
+    needs: detect
+    if: needs.detect.outputs.has_build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Run ESP-IDF unit tests on Linux
+        uses: espressif/esp-idf-ci-action@9d38657f3d789ca759b2b37aaf5ceffbc42c4f0d # v1
+        with:
+          esp_idf_version: v6.1
+          target: linux
+          path: firmware/test
+          command: idf.py --preview set-target linux && idf.py build && ./build/open_extraction_tests.elf
+
   not-configured:
     name: Build system not configured
     needs: detect

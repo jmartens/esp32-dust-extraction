@@ -53,8 +53,10 @@ TEST_CASE("dispatches subscribers in registration order",
   std::vector<int> calls;
   const auto type = event_type("collector.started");
 
-  dispatcher.subscribe(type, [&calls](const Event &) { calls.push_back(1); });
-  dispatcher.subscribe(type, [&calls](const Event &) { calls.push_back(2); });
+  (void)dispatcher.subscribe(type,
+                             [&calls](const Event &) { calls.push_back(1); });
+  (void)dispatcher.subscribe(type,
+                             [&calls](const Event &) { calls.push_back(2); });
   dispatcher.publish(create_event(type));
 
   TEST_ASSERT_EQUAL_UINT32(2, calls.size());
@@ -70,10 +72,10 @@ TEST_CASE("dispatches only subscribers for the published event type",
   const auto started = event_type("collector.started");
   const auto stopped = event_type("collector.stopped");
 
-  dispatcher.subscribe(started,
-                       [&started_calls](const Event &) { ++started_calls; });
-  dispatcher.subscribe(stopped,
-                       [&stopped_calls](const Event &) { ++stopped_calls; });
+  (void)dispatcher.subscribe(
+      started, [&started_calls](const Event &) { ++started_calls; });
+  (void)dispatcher.subscribe(
+      stopped, [&stopped_calls](const Event &) { ++stopped_calls; });
   dispatcher.publish(create_event(started));
 
   TEST_ASSERT_EQUAL_INT(1, started_calls);
@@ -88,7 +90,8 @@ TEST_CASE("unsubscribing removes only the requested subscriber",
 
   const auto first = dispatcher.subscribe(
       type, [&calls](const Event &) { calls.push_back(1); });
-  dispatcher.subscribe(type, [&calls](const Event &) { calls.push_back(2); });
+  (void)dispatcher.subscribe(type,
+                             [&calls](const Event &) { calls.push_back(2); });
 
   TEST_ASSERT_TRUE(dispatcher.unsubscribe(first));
   TEST_ASSERT_FALSE(dispatcher.unsubscribe(first));
@@ -104,8 +107,8 @@ TEST_CASE("publishing an event with no matching subscriber is ignored",
   EventDispatcher dispatcher;
   int calls = 0;
 
-  dispatcher.subscribe(event_type("collector.started"),
-                       [&calls](const Event &) { ++calls; });
+  (void)dispatcher.subscribe(event_type("collector.started"),
+                             [&calls](const Event &) { ++calls; });
   dispatcher.publish(create_event(event_type("collector.faulted")));
 
   TEST_ASSERT_EQUAL_INT(0, calls);
