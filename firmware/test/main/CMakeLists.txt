@@ -7,6 +7,9 @@ set(COLLECTOR_EVENTS_TEST_DIR
 set(COLLECTOR_COMMANDS_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_commands/test"
 )
+set(COLLECTOR_STATE_MACHINE_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_state_machine/test"
+)
 set(COLLECTOR_UNIT_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_unit/test"
 )
@@ -29,6 +32,7 @@ idf_component_register(
         "test_main.cpp"
         "${COLLECTOR_EVENTS_TEST_DIR}/test_collector_events.cpp"
         "${COLLECTOR_COMMANDS_TEST_DIR}/test_collector_commands.cpp"
+        "${COLLECTOR_STATE_MACHINE_TEST_DIR}/test_collector_state_machine.cpp"
         "${COLLECTOR_UNIT_TEST_DIR}/test_collector_unit.cpp"
         "${COMMAND_TEST_DIR}/test_command.cpp"
         "${COMMAND_DISPATCHER_TEST_DIR}/test_command_dispatcher.cpp"
@@ -41,6 +45,7 @@ idf_component_register(
         unity
         collector_commands
         collector_events
+        collector_state_machine
         collector_unit
         command
         command_dispatcher
