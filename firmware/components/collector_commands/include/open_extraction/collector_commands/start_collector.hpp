@@ -16,8 +16,7 @@ public:
                  command::Timestamp timestamp)
       : Command({
             .id = std::move(id),
-            .type = command::CommandType::from_string(
-                        std::string(kCommandType))
+            .type = command::CommandType::from_string(std::string(kCommandType))
                         .value(),
             .target = std::move(target),
             .timestamp = timestamp,

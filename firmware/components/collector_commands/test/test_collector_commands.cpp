@@ -26,8 +26,7 @@ void assert_metadata(const CollectorCommand &command,
 }
 
 CommandId command_id() {
-  return CommandId::from_string("ea290ba8-5255-4c7f-9fc6-9a1b94d5a742")
-      .value();
+  return CommandId::from_string("ea290ba8-5255-4c7f-9fc6-9a1b94d5a742").value();
 }
 
 DeviceUid target() {
@@ -56,7 +55,8 @@ TEST_CASE("a stop collector command preserves immutable metadata",
   const StopCollector command(command_id(), target(), timestamp());
 
   assert_metadata(command, "collector.stop");
-  TEST_ASSERT_EQUAL_STRING("collector.stop", StopCollector::kCommandType.data());
+  TEST_ASSERT_EQUAL_STRING("collector.stop",
+                           StopCollector::kCommandType.data());
   TEST_ASSERT_FALSE(std::is_copy_assignable_v<StopCollector>);
   TEST_ASSERT_FALSE(std::is_move_assignable_v<StopCollector>);
 }
