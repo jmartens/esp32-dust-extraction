@@ -86,5 +86,23 @@ jobs:
           esp_idf_version: v6.1
           target: linux
           path: firmware/test
-          command: idf.py --preview set-target linux && idf.py build && ./build/open_extraction_tests.elf
+          command: bash ./run_coverage.sh
           extra_docker_args: -e IDF_CCACHE_ENABLE=1 -e CCACHE_DIR=/ccache -v ${{ github.workspace }}/.ccache:/ccache
+
+      - name: Publish coverage summary
+        if: always() && hashFiles('firmware/test/coverage/summary.txt') != ''
+        shell: bash
+        run: |
+          {
+            echo '## Host unit-test coverage'
+            echo '```'
+            cat firmware/test/coverage/summary.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        if: always() && hashFiles('firmware/test/coverage/coverage.xml') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: host-test-coverage
+          path: firmware/test/coverage/
