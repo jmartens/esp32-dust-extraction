@@ -4,8 +4,8 @@
 # report generation never masks a test failure.
 set -uo pipefail
 
-cd "$(dirname "$0")"
-repo_root="$(cd ../.. && pwd)"
+cd "$(dirname "$0")" || exit 1
+repo_root="$(cd ../.. && pwd)" || exit 1
 out_dir="$PWD/coverage"
 
 idf.py --preview set-target linux || exit 1
