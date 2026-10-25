@@ -179,7 +179,7 @@ Potential future milestones include:
 * Device discovery
 * Pairing workflows
 * Security improvements
-* Web UI enhancements
+* Web UI enhancements (see #115)
 * Diagnostics dashboard
 * Historical telemetry
 * Multi-controller support
