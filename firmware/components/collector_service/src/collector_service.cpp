@@ -5,6 +5,7 @@
 
 #include "open_extraction/collector_commands/start_collector.hpp"
 #include "open_extraction/collector_commands/stop_collector.hpp"
+#include "open_extraction/collector_events/collector_fault.hpp"
 
 namespace open_extraction::collector_service {
 
@@ -12,10 +13,12 @@ using collector_unit::CollectorState;
 
 CollectorService::CollectorService(
     command_dispatcher::CommandDispatcher &dispatcher,
+    event_dispatcher::EventDispatcher &event_dispatcher,
     const collector_unit::ICollectorUnit &unit, event::DeviceUid device_uid,
     event::EventIdGenerator &id_generator, Clock clock)
-    : dispatcher_(dispatcher), unit_(unit), device_uid_(std::move(device_uid)),
-      id_generator_(id_generator), clock_(std::move(clock)) {}
+    : dispatcher_(dispatcher), event_dispatcher_(event_dispatcher), unit_(unit),
+      device_uid_(std::move(device_uid)), id_generator_(id_generator),
+      clock_(std::move(clock)) {}
 
 CollectorState CollectorService::state() const { return unit_.state(); }
 
@@ -35,6 +38,12 @@ bool CollectorService::request_stop() {
     return false;
   }
   return dispatch_command<collector_commands::StopCollector>();
+}
+
+void CollectorService::report_fault(std::string reason) {
+  const collector_events::CollectorFault fault(
+      id_generator_.generate(), clock_(), device_uid_, std::move(reason));
+  event_dispatcher_.publish(fault);
 }
 
 template <typename CommandT> bool CollectorService::dispatch_command() const {

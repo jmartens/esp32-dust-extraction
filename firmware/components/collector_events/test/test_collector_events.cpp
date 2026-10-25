@@ -3,6 +3,7 @@
 
 #include "unity.h"
 
+#include "open_extraction/collector_events/collector_fault.hpp"
 #include "open_extraction/collector_events/collector_started.hpp"
 #include "open_extraction/collector_events/collector_stopped.hpp"
 
@@ -65,4 +66,17 @@ TEST_CASE("a collector stopped event preserves immutable metadata",
                      open_extraction::collector_events::CollectorStopped>));
   TEST_ASSERT_FALSE((std::is_move_assignable_v<
                      open_extraction::collector_events::CollectorStopped>));
+}
+
+TEST_CASE("a collector fault preserves its immutable reason",
+          "[collector_events]") {
+  const open_extraction::collector_events::CollectorFault event(
+      event_id(), occurred_at(), device_uid(), "motor overload");
+
+  assert_metadata(event, "collector.fault");
+  TEST_ASSERT_EQUAL_STRING("motor overload", event.reason().c_str());
+  TEST_ASSERT_FALSE((std::is_copy_assignable_v<
+                     open_extraction::collector_events::CollectorFault>));
+  TEST_ASSERT_FALSE((std::is_move_assignable_v<
+                     open_extraction::collector_events::CollectorFault>));
 }

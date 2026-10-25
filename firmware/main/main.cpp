@@ -15,6 +15,7 @@
 #include "open_extraction/collector_service/collector_service.hpp"
 #include "open_extraction/collector_state_machine/collector_state_machine.hpp"
 #include "open_extraction/command_dispatcher/command_dispatcher.hpp"
+#include "open_extraction/event_dispatcher/event_dispatcher.hpp"
 #include "open_extraction/event_id_generator/esp_event_id_generator.hpp"
 #include "open_extraction/http_routes/http_routes.hpp"
 #include "open_extraction/http_server/http_server.hpp"
@@ -66,6 +67,7 @@ std::string device_uid_string() {
 extern "C" void app_main(void) {
   static StateMachineUnit unit;
   static command_dispatcher::CommandDispatcher dispatcher;
+  static event_dispatcher::EventDispatcher event_dispatcher;
   static event_id_generator::EspEventIdGenerator ids;
 
   const auto uid = event::DeviceUid::from_string(device_uid_string());
@@ -92,7 +94,7 @@ extern "C" void app_main(void) {
   }
 
   static collector_service::CollectorService service(
-      dispatcher, unit, *uid, ids, [] {
+      dispatcher, event_dispatcher, unit, *uid, ids, [] {
         return std::chrono::time_point_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now());
       });

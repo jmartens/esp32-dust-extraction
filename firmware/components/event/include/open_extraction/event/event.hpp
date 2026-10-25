@@ -75,6 +75,8 @@ public:
   [[nodiscard]] std::string_view event_type() const noexcept;
   [[nodiscard]] Timestamp occurred_at() const noexcept;
   [[nodiscard]] std::string_view originating_device() const noexcept;
+  [[nodiscard]] virtual std::optional<std::string_view>
+  fault_reason() const noexcept;
 
 protected:
   explicit Event(EventMetadata metadata);
