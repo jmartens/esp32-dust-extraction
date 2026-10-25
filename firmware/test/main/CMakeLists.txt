@@ -10,6 +10,9 @@ set(COLLECTOR_COMMANDS_TEST_DIR
 set(COLLECTOR_API_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_api/test"
 )
+set(COLLECTOR_PAGE_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_page/test"
+)
 set(COLLECTOR_STATE_MACHINE_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_state_machine/test"
 )
@@ -37,6 +40,7 @@ idf_component_register(
         "${COLLECTOR_EVENTS_TEST_DIR}/test_collector_events.cpp"
         "${COLLECTOR_COMMANDS_TEST_DIR}/test_collector_commands.cpp"
         "${COLLECTOR_API_TEST_DIR}/test_collector_api.cpp"
+        "${COLLECTOR_PAGE_TEST_DIR}/test_collector_page.cpp"
         "${COLLECTOR_STATE_MACHINE_TEST_DIR}/test_collector_state_machine.cpp"
         "${COLLECTOR_UNIT_TEST_DIR}/test_collector_unit.cpp"
         "${COMMAND_TEST_DIR}/test_command.cpp"
@@ -52,6 +56,7 @@ idf_component_register(
         collector_api
         collector_commands
         collector_events
+        collector_page
         collector_state_machine
         collector_unit
         command
