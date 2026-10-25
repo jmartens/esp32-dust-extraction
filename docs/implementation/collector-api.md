@@ -37,6 +37,25 @@ Errors use the body `{ "error": "<message>" }`.
 | 405    | Method not supported for the path                         |
 | 409    | Request not permitted in the current collector state      |
 
+## Collector service
+
+`firmware/components/collector_service` provides `CollectorService`, the
+concrete `ICollectorControl` the API depends on. It:
+
+- dispatches `StartCollector` / `StopCollector` (targeted at the collector
+  Device UID) through the `CommandDispatcher`; `request_*` returns `true` only
+  when the command was delivered, otherwise the API answers 409;
+- rejects a request without dispatching when the observed state does not allow
+  it (start only from `stopped`, stop only from `running`);
+- reports `state()` from the `ICollectorUnit` and `device_uid()` from its
+  configured Device UID;
+- never changes state itself. Transitions happen only when the command
+  recipient handles the command and the resulting events are processed
+  ([ADR-0009](../adr/0009-separate-event-bus-and-command-bus.md)).
+
+Registering the collector as command recipient, the clock and ID generator
+instances, and routing HTTP to `CollectorApi` are the wiring task (#17).
+
 ## HTML control page
 
 The page is a static file, `firmware/components/collector_page/web/index.html`
