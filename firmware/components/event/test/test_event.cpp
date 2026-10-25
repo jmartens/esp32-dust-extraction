@@ -1,4 +1,5 @@
 #include <chrono>
+#include <type_traits>
 #include <utility>
 
 #include "unity.h"
@@ -46,6 +47,13 @@ TEST_CASE("an event exposes immutable metadata", "[event]") {
                           event.occurred_at().time_since_epoch().count());
   TEST_ASSERT_EQUAL_STRING("CONTROLLER-58BF25A77109",
                            event.originating_device().data());
+}
+
+TEST_CASE("an event cannot be assigned after construction", "[event]") {
+  TEST_ASSERT_FALSE((std::is_copy_assignable_v<Event>));
+  TEST_ASSERT_FALSE((std::is_move_assignable_v<Event>));
+  TEST_ASSERT_FALSE((std::is_copy_assignable_v<TestEvent>));
+  TEST_ASSERT_FALSE((std::is_move_assignable_v<TestEvent>));
 }
 
 TEST_CASE("event metadata rejects malformed identifiers", "[event]") {
