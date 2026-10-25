@@ -1,10 +1,4 @@
-#include "open_extraction/collector_page/collector_page.hpp"
-
-namespace open_extraction::collector_page {
-
-namespace {
-
-constexpr std::string_view kPage = R"html(<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -72,10 +66,3 @@ setInterval(refresh, 2000);
 </script>
 </body>
 </html>
-)html";
-
-} // namespace
-
-std::string_view html() noexcept { return kPage; }
-
-} // namespace open_extraction::collector_page

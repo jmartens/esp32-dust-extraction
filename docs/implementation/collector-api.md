@@ -39,9 +39,17 @@ Errors use the body `{ "error": "<message>" }`.
 
 ## HTML control page
 
-`firmware/components/collector_page` provides a self-contained HTML page (no
-external assets) that shows the collector state and Device UID and offers Start
-and Stop actions. It uses only the endpoints above and polls
-`GET /api/v1/collector` every two seconds to show the confirmed state. Serving
-the page (for example at `/`) is the responsibility of the collector service
-wiring, using `Response::content_type = "text/html"`.
+The page is a static file, `firmware/components/collector_page/web/index.html`
+(no external assets). CMake compiles it into the firmware by generating a
+source file at configure time, so it works on every target, including the
+Linux host tests. Edit the HTML file directly; do not edit generated sources.
+
+It shows the collector state and Device UID and offers Start and Stop actions.
+It uses only the endpoints above and polls `GET /api/v1/collector` every two
+seconds to show the confirmed state. Serving the page (for example at `/`) is
+the responsibility of the collector service wiring, using
+`Response::content_type = "text/html"`.
+
+The page is intentionally framework-free for the MVP. A richer UI is expected
+later and will need a frontend framework and build step, which is out of scope
+here.
