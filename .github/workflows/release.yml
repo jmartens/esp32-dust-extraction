@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
-          node-version: '24'
+          node-version: '20'
 
       - name: Run semantic-release
         env:
@@ -36,5 +36,10 @@ jobs:
           # prefer a user-provided RELEASE_GITHUB_TOKEN; fallback to built-in GITHUB_TOKEN
           export GITHUB_TOKEN="${RELEASE_GITHUB_TOKEN:-$GITHUB_TOKEN}"
 
-          # Use npx to avoid committing package.json; install ephemeral packages as needed
-          npx -y semantic-release
+          # npx must install every plugin referenced in .releaserc.json alongside semantic-release
+          npx -y \
+            -p semantic-release@22 \
+            -p @semantic-release/changelog@6 \
+            -p @semantic-release/git@10 \
+            -p conventional-changelog-conventionalcommits@7 \
+            semantic-release
