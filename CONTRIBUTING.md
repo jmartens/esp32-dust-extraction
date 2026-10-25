@@ -273,6 +273,8 @@ persistence/
 
 Business logic shall be testable on desktop platforms.
 
+Host unit-test coverage is reported by CI (job summary plus the `host-test-coverage` artifact with Cobertura XML and HTML). No coverage threshold is enforced. To reproduce locally on Linux with an ESP-IDF environment and `gcovr` available, run `bash firmware/test/run_coverage.sh`; reports are written to `firmware/test/coverage/`. Only `firmware/components/` production sources are measured; test code is excluded.
+
 ESP-IDF builds can use ccache to avoid recompiling unchanged files. Run `idf.py --ccache build`, or set `IDF_CCACHE_ENABLE=1` in the environment before running `idf.py`.
 
 Testing layers are:
