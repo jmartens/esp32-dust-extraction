@@ -6,18 +6,16 @@
 
 namespace open_extraction::command_dispatcher {
 
-bool CommandDispatcher::register_recipient(
-    const command::DeviceUid &recipient, CommandRecipient handler) {
+bool CommandDispatcher::register_recipient(const command::DeviceUid &recipient,
+                                           CommandRecipient handler) {
   if (!handler) {
     return false;
   }
 
   const std::string uid(recipient.value());
-  const auto existing =
-      std::find_if(recipients_.begin(), recipients_.end(),
-                   [&uid](const Recipient &candidate) {
-                     return candidate.uid == uid;
-                   });
+  const auto existing = std::find_if(
+      recipients_.begin(), recipients_.end(),
+      [&uid](const Recipient &candidate) { return candidate.uid == uid; });
   if (existing != recipients_.end()) {
     return false;
   }
@@ -29,11 +27,9 @@ bool CommandDispatcher::register_recipient(
 bool CommandDispatcher::unregister_recipient(
     const command::DeviceUid &recipient) {
   const std::string_view uid = recipient.value();
-  const auto existing =
-      std::find_if(recipients_.begin(), recipients_.end(),
-                   [uid](const Recipient &candidate) {
-                     return candidate.uid == uid;
-                   });
+  const auto existing = std::find_if(
+      recipients_.begin(), recipients_.end(),
+      [uid](const Recipient &candidate) { return candidate.uid == uid; });
   if (existing == recipients_.end()) {
     return false;
   }
@@ -45,11 +41,9 @@ bool CommandDispatcher::unregister_recipient(
 DispatchResult
 CommandDispatcher::dispatch(const command::Command &command) const {
   const std::string_view target = command.target();
-  const auto recipient =
-      std::find_if(recipients_.begin(), recipients_.end(),
-                   [target](const Recipient &candidate) {
-                     return candidate.uid == target;
-                   });
+  const auto recipient = std::find_if(
+      recipients_.begin(), recipients_.end(),
+      [target](const Recipient &candidate) { return candidate.uid == target; });
   if (recipient == recipients_.end()) {
     return DispatchResult::unknown_recipient;
   }

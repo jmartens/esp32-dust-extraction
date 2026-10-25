@@ -18,11 +18,9 @@ enum class DispatchResult {
 
 class CommandDispatcher {
 public:
-  [[nodiscard]] bool
-  register_recipient(const command::DeviceUid &recipient,
-                     CommandRecipient handler);
-  [[nodiscard]] bool
-  unregister_recipient(const command::DeviceUid &recipient);
+  [[nodiscard]] bool register_recipient(const command::DeviceUid &recipient,
+                                        CommandRecipient handler);
+  [[nodiscard]] bool unregister_recipient(const command::DeviceUid &recipient);
   [[nodiscard]] DispatchResult dispatch(const command::Command &command) const;
 
 private:
