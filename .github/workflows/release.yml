@@ -6,7 +6,6 @@ on:
       - main
       - 'hotfix/*'
       - 'release/*'
-      - develop
   workflow_dispatch:
 
 jobs:
