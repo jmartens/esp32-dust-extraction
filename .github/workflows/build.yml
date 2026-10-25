@@ -45,12 +45,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      - name: Restore ESP-IDF ccache
+        uses: actions/cache@0c45773b623bea8c8e75f6c82c208c3cf94ea4f9 # v4.2.4
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-esp32-${{ hashFiles('firmware/**/CMakeLists.txt', 'firmware/**/idf_component.yml', 'firmware/sdkconfig*') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ${{ runner.os }}-esp32-${{ hashFiles('firmware/**/CMakeLists.txt', 'firmware/**/idf_component.yml', 'firmware/sdkconfig*') }}-
+            ${{ runner.os }}-esp32-
+
       - name: Build firmware
         uses: espressif/esp-idf-ci-action@9d38657f3d789ca759b2b37aaf5ceffbc42c4f0d # v1
         with:
           esp_idf_version: v6.1
           target: esp32
           path: firmware
+          extra_docker_args: -e IDF_CCACHE_ENABLE=1 -e CCACHE_DIR=/ccache -v ${{ github.workspace }}/.ccache:/ccache
 
   host-tests:
     name: Run host unit tests
@@ -61,6 +71,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      - name: Restore host-test ESP-IDF ccache
+        uses: actions/cache@0c45773b623bea8c8e75f6c82c208c3cf94ea4f9 # v4.2.4
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-host-${{ hashFiles('firmware/**/CMakeLists.txt', 'firmware/**/idf_component.yml', 'firmware/sdkconfig*') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ${{ runner.os }}-host-${{ hashFiles('firmware/**/CMakeLists.txt', 'firmware/**/idf_component.yml', 'firmware/sdkconfig*') }}-
+            ${{ runner.os }}-host-
+
       - name: Run ESP-IDF unit tests on Linux
         uses: espressif/esp-idf-ci-action@9d38657f3d789ca759b2b37aaf5ceffbc42c4f0d # v1
         with:
@@ -68,3 +87,4 @@ jobs:
           target: linux
           path: firmware/test
           command: idf.py --preview set-target linux && idf.py build && ./build/open_extraction_tests.elf
+          extra_docker_args: -e IDF_CCACHE_ENABLE=1 -e CCACHE_DIR=/ccache -v ${{ github.workspace }}/.ccache:/ccache
