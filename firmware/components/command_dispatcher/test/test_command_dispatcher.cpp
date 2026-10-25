@@ -30,8 +30,8 @@ public:
 
 CommandMetadata valid_metadata() {
   return {
-      .id =
-          CommandId::from_string("ea290ba8-5255-4c7f-9fc6-9a1b94d5a742").value(),
+      .id = CommandId::from_string("ea290ba8-5255-4c7f-9fc6-9a1b94d5a742")
+                .value(),
       .type = CommandType::from_string("gate.open").value(),
       .target = DeviceUid::from_string("GATE-58BF25A77109").value(),
       .timestamp = Timestamp(std::chrono::milliseconds(1'726'258'400'123)),
@@ -68,8 +68,8 @@ TEST_CASE("dispatches only to the recipient addressed by the command",
   int target_calls = 0;
   int other_calls = 0;
 
-  TEST_ASSERT_TRUE(dispatcher.register_recipient(
-      target(), [&target_calls](const Command &) {
+  TEST_ASSERT_TRUE(
+      dispatcher.register_recipient(target(), [&target_calls](const Command &) {
         ++target_calls;
         return true;
       }));
