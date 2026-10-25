@@ -53,8 +53,8 @@ concrete `ICollectorControl` the API depends on. It:
   recipient handles the command and the resulting events are processed
   ([ADR-0009](../adr/0009-separate-event-bus-and-command-bus.md)).
 
-Registering the collector as command recipient, the clock and ID generator
-instances, and routing HTTP to `CollectorApi` are the wiring task (#17).
+Routing HTTP to `CollectorApi` and the startup wiring are described in
+[HTTP Server](http-server.md).
 
 ## HTML control page
 
@@ -65,9 +65,8 @@ Linux host tests. Edit the HTML file directly; do not edit generated sources.
 
 It shows the collector state and Device UID and offers Start and Stop actions.
 It uses only the endpoints above and polls `GET /api/v1/collector` every two
-seconds to show the confirmed state. Serving the page (for example at `/`) is
-the responsibility of the collector service wiring, using
-`Response::content_type = "text/html"`.
+seconds to show the confirmed state. The page is served at `GET /` with
+`Response::content_type = "text/html"` by the `http_routes` component.
 
 The page is intentionally framework-free for the MVP. A richer UI is expected
 later and will need a frontend framework and build step, which is out of scope
