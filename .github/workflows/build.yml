@@ -62,12 +62,3 @@ jobs:
           target: linux
           path: firmware/test
           command: idf.py --preview set-target linux && idf.py build && ./build/open_extraction_tests.elf
-
-  not-configured:
-    name: Build system not configured
-    needs: detect
-    if: needs.detect.outputs.has_build == 'false'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Explain deferred build
-        run: echo "No firmware/CMakeLists.txt is committed yet; firmware build validation remains deferred."
