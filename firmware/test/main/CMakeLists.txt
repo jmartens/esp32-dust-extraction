@@ -19,8 +19,8 @@ set(COLLECTOR_SERVICE_TEST_DIR
 set(COLLECTOR_STATE_MACHINE_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_state_machine/test"
 )
-set(COLLECTOR_UNIT_TEST_DIR
-    "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_unit/test"
+set(RELAY_BACKED_COLLECTOR_UNIT_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/relay_backed_collector_unit/test"
 )
 set(COMMAND_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/command/test")
 set(COMMAND_DISPATCHER_TEST_DIR
@@ -47,7 +47,7 @@ idf_component_register(
         "${COLLECTOR_PAGE_TEST_DIR}/test_collector_page.cpp"
         "${COLLECTOR_SERVICE_TEST_DIR}/test_collector_service.cpp"
         "${COLLECTOR_STATE_MACHINE_TEST_DIR}/test_collector_state_machine.cpp"
-        "${COLLECTOR_UNIT_TEST_DIR}/test_collector_unit.cpp"
+        "${RELAY_BACKED_COLLECTOR_UNIT_TEST_DIR}/test_relay_backed_collector_unit.cpp"
         "${COMMAND_TEST_DIR}/test_command.cpp"
         "${COMMAND_DISPATCHER_TEST_DIR}/test_command_dispatcher.cpp"
         "${EVENT_TEST_DIR}/test_event.cpp"
@@ -66,6 +66,7 @@ idf_component_register(
         collector_service
         collector_state_machine
         collector_unit
+        relay_backed_collector_unit
         command
         command_dispatcher
         event
