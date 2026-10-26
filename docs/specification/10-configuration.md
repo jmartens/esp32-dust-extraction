@@ -85,9 +85,9 @@ Examples include:
 
 Machine Units:
 
-- current thresholds;
-- debounce times;
-- calibration values.
+- calibrated RMS current thresholds for demand start and stop;
+- debounce duration;
+- current sensor calibration values.
 
 Gate Units:
 
@@ -102,6 +102,17 @@ Collector Units:
 - safety timeouts.
 
 The exact configuration items SHALL depend upon Unit Type and advertised Capabilities.
+
+Each Machine Unit SHALL have a Machine profile in Unit Configuration.
+Thresholds SHALL use calibrated RMS current and SHALL provide separate start
+and stop values to support hysteresis. Debounce duration and calibration
+values SHALL be configurable per Unit. A profile SHALL be validated before it
+is applied; the Controller SHALL NOT substitute undocumented threshold or
+calibration defaults for missing or invalid values.
+
+Collector Unit timing configuration SHALL include the automatic start delay.
+The default start delay SHALL be one second; zero SHALL be a valid value to
+disable the delay.
 
 ---
 
