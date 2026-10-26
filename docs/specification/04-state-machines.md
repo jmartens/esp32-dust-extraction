@@ -280,6 +280,16 @@ Run-on timer is active.
 
 ---
 
+## Automatic Start Delay
+
+In `AUTO` mode, a new aggregate demand SHALL begin a configurable start delay
+before the Collector output is commanded on. The default delay SHALL be one
+second; zero SHALL be valid. If demand ends before the delay expires, the
+pending start SHALL be cancelled. Returning to `AUTO` with demand already
+active SHALL command the output on immediately.
+
+---
+
 ## Stopping
 
 StopCollector Command has been issued.

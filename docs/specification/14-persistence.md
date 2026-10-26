@@ -49,6 +49,7 @@ Examples include:
 - route definitions;
 - pairing information;
 - calibration values;
+- Machine Unit demand profiles, including thresholds and debounce settings;
 - friendly names;
 - user metadata.
 
@@ -182,6 +183,10 @@ The following information SHALL be persistent.
 
 ```text
 Configuration
+
+YES
+
+Machine Unit Demand Profiles
 
 YES
 
