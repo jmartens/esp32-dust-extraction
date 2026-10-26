@@ -147,6 +147,10 @@ Examples:
 - CollectorStarted
 - CollectorStopped
 
+For a Collector Unit without motor-feedback hardware, `CollectorStarted` and
+`CollectorStopped` SHALL describe the commanded output state only. They SHALL
+NOT imply that the collector motor physically started or stopped.
+
 `CollectorFault` SHALL include an immutable `reason` string describing the
 business-significant fault. Its event representation SHALL serialize this
 field as `reason`. The owning Collector Service SHALL publish the event when

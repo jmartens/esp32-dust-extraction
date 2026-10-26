@@ -202,6 +202,25 @@ The recovery mechanism SHALL be determined by the owning Service.
 
 ---
 
+## Collector Faults Without Motor Feedback
+
+The Collector Service SHALL latch faults that it can detect from the control
+path, such as a detected relay-control failure. It SHALL NOT infer a motor
+failure from the absence of motor feedback when no feedback sensor is present.
+
+While a Collector fault is active, the Service SHALL NOT automatically retry
+start or stop commands. Recovery requires an explicit operator reset. On
+reset, the Service SHALL clear the fault, return its logical state to Stopped,
+and reevaluate current demand.
+
+Without motor-feedback hardware, the Controller cannot detect that the motor
+failed to start, stalled, or continued running after the output was commanded
+off. It SHALL NOT claim that the Collector is physically running or stopped
+based solely on its output state. Independent electrical and motor protection
+remains necessary; the Controller's fault handling does not replace it.
+
+---
+
 # Route Faults
 
 The Routing Service SHALL determine the impact of faults upon active Routes.

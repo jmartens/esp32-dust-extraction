@@ -93,7 +93,7 @@ Linux host tests. Edit the HTML file directly; do not edit generated sources.
 
 It shows the collector state and Device UID and offers Start and Stop actions.
 It uses only the endpoints above and polls `GET /api/v1/collector` every two
-seconds to show the confirmed state. The page is served at `GET /` with
+seconds to show the reported output state. The page is served at `GET /` with
 `Response::content_type = "text/html"` by the `http_routes` component.
 
 The page is intentionally framework-free for the MVP. A richer UI is expected
