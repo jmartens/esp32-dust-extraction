@@ -92,7 +92,7 @@ esp32-dust-extraction/
 │   │   │               └── collector_unit.cpp
 │   │   │
 │   │   ├── transport/                # Transport layer (all devices)
-│   │   │   ├── esp_now_transport/
+│   │   │   ├── esp_now_transport/    # One backend per platform (ESP32, ESP8266)
 │   │   │   │   ├── discovery_protocol/
 │   │   │   │   ├── pairing_protocol/
 │   │   │   │   ├── message_codec/
