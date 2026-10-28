@@ -204,6 +204,9 @@ Variable-length payloads MAY be used where required.
 
 Padding bytes SHALL be avoided.
 
+The complete packet (Header, Payload and Signature) SHALL NOT exceed 250 bytes,
+the ESP-NOW payload limit on ESP32 and ESP8266.
+
 ---
 
 # Signature
