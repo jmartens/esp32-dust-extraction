@@ -37,6 +37,9 @@ set(EVENT_JSON_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/event_json/test")
 set(HTTP_SERVER_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/http_server/test")
 set(HTTP_ROUTES_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/http_routes/test")
 set(RELAY_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/relay/test")
+set(MACHINE_DEMAND_SOURCE_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/machine_demand_source/test"
+)
 
 idf_component_register(
     SRCS
@@ -57,6 +60,7 @@ idf_component_register(
         "${HTTP_ROUTES_TEST_DIR}/test_http_routes.cpp"
         "${HTTP_SERVER_TEST_DIR}/test_http_server.cpp"
         "${RELAY_TEST_DIR}/test_relay_driver.cpp"
+        "${MACHINE_DEMAND_SOURCE_TEST_DIR}/test_machine_demand_source.cpp"
     PRIV_REQUIRES
         unity
         collector_api
@@ -75,6 +79,7 @@ idf_component_register(
         event_json
         http_routes
         http_server
+        machine_demand_source
         relay
     WHOLE_ARCHIVE
 )
