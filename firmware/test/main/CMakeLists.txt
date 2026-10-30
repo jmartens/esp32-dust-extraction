@@ -1,6 +1,7 @@
 set(OPEN_EXTRACTION_COMPONENTS_DIR
     "${CMAKE_CURRENT_LIST_DIR}/../../components"
 )
+set(ADC_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/adc/test")
 set(COLLECTOR_EVENTS_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_events/test"
 )
@@ -41,6 +42,7 @@ set(RELAY_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/relay/test")
 idf_component_register(
     SRCS
         "test_main.cpp"
+        "${ADC_TEST_DIR}/test_adc_sampler.cpp"
         "${COLLECTOR_EVENTS_TEST_DIR}/test_collector_events.cpp"
         "${COLLECTOR_COMMANDS_TEST_DIR}/test_collector_commands.cpp"
         "${COLLECTOR_API_TEST_DIR}/test_collector_api.cpp"
@@ -59,6 +61,7 @@ idf_component_register(
         "${RELAY_TEST_DIR}/test_relay_driver.cpp"
     PRIV_REQUIRES
         unity
+        adc
         collector_api
         collector_commands
         collector_events
