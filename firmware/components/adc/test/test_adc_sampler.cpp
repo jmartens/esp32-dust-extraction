@@ -13,6 +13,8 @@ public:
   FakeAdcSampler(const AdcConfig config, const int failing_read = -1)
       : config_(config), failing_read_(failing_read) {}
 
+  using AdcSampler::read_raw;
+
   [[nodiscard]] const AdcConfig &config() const override { return config_; }
 
   [[nodiscard]] std::optional<std::uint16_t> read_raw() override {
