@@ -124,4 +124,3 @@ jobs:
           file: firmware/test/coverage/coverage.xml
           language: C++
           label: code-coverage/host-tests
-          fail-on-error: false
