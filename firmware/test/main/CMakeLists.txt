@@ -44,6 +44,9 @@ set(RELAY_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/relay/test")
 set(MACHINE_DEMAND_SOURCE_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/machine_demand_source/test"
 )
+set(CURRENT_TRANSFORMER_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/current_transformer/test"
+)
 
 idf_component_register(
     SRCS
@@ -67,6 +70,7 @@ idf_component_register(
         "${HTTP_SERVER_TEST_DIR}/test_http_server.cpp"
         "${RELAY_TEST_DIR}/test_relay_driver.cpp"
         "${MACHINE_DEMAND_SOURCE_TEST_DIR}/test_machine_demand_source.cpp"
+        "${CURRENT_TRANSFORMER_TEST_DIR}/test_current_transformer.cpp"
     PRIV_REQUIRES
         unity
         demand_aggregator
@@ -88,6 +92,7 @@ idf_component_register(
         http_routes
         http_server
         machine_demand_source
+        current_transformer
         relay
     WHOLE_ARCHIVE
 )
