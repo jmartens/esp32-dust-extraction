@@ -361,3 +361,25 @@ TEST_CASE("released automatic demand cancels a pending delayed start",
   TEST_ASSERT_FALSE(service.demand_suppressed());
   TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
 }
+
+TEST_CASE("zero start delay starts new automatic demand immediately",
+          "[collector_service]") {
+  Fixture f;
+  CollectorService service = f.service(std::chrono::milliseconds::zero());
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StartCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+}
+
+TEST_CASE("negative start delay is clamped to no delay",
+          "[collector_service]") {
+  Fixture f;
+  CollectorService service = f.service(std::chrono::milliseconds(-250));
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+}
