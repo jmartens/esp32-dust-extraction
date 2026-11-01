@@ -39,6 +39,12 @@ Run commands from the repository root. Only Docker is required. `test` runs
   CI and in the container volume.
 * Generated `sdkconfig*`, `dependencies.lock` and `managed_components/` are git-ignored.
 
+## Version updates (Renovate)
+
+* Patch updates of the IDF image open PRs automatically; minor and major updates wait for approval on the Renovate dependency dashboard.
+* Rationale: IDF minors can change deprecations, Kconfig/sdkconfig, component APIs and managed-component compatibility, and the build uses `-Werror`, so a toolchain change should be deliberate. CI (build and host tests) still validates every update PR, but does not cover hardware behaviour.
+* Both `scripts/idf-version` and `esp_idf_version` in the build workflow are tracked as `espressif/idf` and grouped into one PR so they stay in sync.
+
 ## Troubleshooting
 
 * **Stale host `build/`**: running `idf.py` on the host and then `docker run ... idf.py build` against
