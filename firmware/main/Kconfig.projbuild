@@ -17,6 +17,14 @@ menu "Open Extraction"
             Manual override transitions to AUTO with active demand start
             immediately, regardless of this delay.
 
+    config OPEN_EXTRACTION_COLLECTOR_RUN_ON_MS
+        int "Collector run-on duration (milliseconds)"
+        range 0 600000
+        default 10000
+        help
+            How long the collector keeps running in AUTO mode after the last
+            active machine demand ends. New demand cancels the pending stop.
+
     config OPEN_EXTRACTION_COLLECTOR_RELAY_GPIO
         int "Collector relay GPIO pin"
         range 0 33
