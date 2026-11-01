@@ -12,3 +12,11 @@
 
 firmware/test/build/
 firmware/test/coverage/
+firmware/test/managed_components
+firmware/managed_components
+firmware/sdkconfig
+firmware/sdkconfig.old
+firmware/dependencies.lock
+firmware/test/sdkconfig
+firmware/test/dependencies.lock
+firmware/test/sdkconfig.old

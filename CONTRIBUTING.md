@@ -273,7 +273,7 @@ persistence/
 
 Business logic shall be testable on desktop platforms.
 
-Host unit-test coverage is reported by CI (job summary plus the `host-test-coverage` artifact with Cobertura XML and HTML). For same-repository pull requests CI also posts one summary comment, updated on each run rather than duplicated; fork PRs skip the comment because their token is read-only. No coverage threshold is enforced. To reproduce locally on Linux with an ESP-IDF environment and `gcovr` available, run `bash firmware/test/run_coverage.sh`; reports are written to `firmware/test/coverage/`. Only `firmware/components/` production sources are measured; test code is excluded.
+Host unit-test coverage is reported by CI (job summary plus the `host-test-coverage` artifact with Cobertura XML and HTML). For same-repository pull requests CI also posts one summary comment, updated on each run rather than duplicated; fork PRs skip the comment because their token is read-only. No coverage threshold is enforced. The simplest way to reproduce locally is the Docker wrapper (`make test` on Linux/macOS, `./scripts/idf-docker.ps1 test` on Windows; see [docs/implementation/build-system.md](docs/implementation/build-system.md)). Alternatively, on Linux with an ESP-IDF environment and `gcovr` available, run `bash firmware/test/run_coverage.sh`; reports are written to `firmware/test/coverage/`. Only `firmware/components/` production sources are measured; test code is excluded.
 
 ESP-IDF builds can use ccache to avoid recompiling unchanged files. Run `idf.py --ccache build`, or set `IDF_CCACHE_ENABLE=1` in the environment before running `idf.py`.
 
@@ -339,6 +339,8 @@ Code that fails CI shall not be merged.
 ---
 
 ## Development Tooling
+
+A reproducible containerised ESP-IDF environment is provided: `make build` / `make test` (Linux, macOS) or `./scripts/idf-docker.ps1 build` / `test` (Windows). Only Docker is required; the image tag is pinned in `scripts/idf-version`.
 
 The project uses or intends to use:
 

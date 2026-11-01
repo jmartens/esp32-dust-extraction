@@ -52,6 +52,21 @@ The system continues to operate when Wi-Fi or Home Assistant is unavailable.
 See [REPOSITORY_LAYOUT.md](REPOSITORY_LAYOUT.md) for the repository structure,
 architecture constraints, development workflow, and planned areas.
 
+## Building
+
+Build and run host tests without a local ESP-IDF install (Docker only):
+
+```sh
+# Windows PowerShell
+./scripts/idf-docker.ps1 build
+./scripts/idf-docker.ps1 test
+
+# Linux / macOS
+make build
+make test
+```n
+See [docs/implementation/build-system.md](docs/implementation/build-system.md).
+
 ## Status
 
 Architecture and documentation are currently being developed.
