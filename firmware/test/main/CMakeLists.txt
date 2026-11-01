@@ -1,6 +1,9 @@
 set(OPEN_EXTRACTION_COMPONENTS_DIR
     "${CMAKE_CURRENT_LIST_DIR}/../../components"
 )
+set(DEMAND_AGGREGATOR_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/demand_aggregator/test"
+)
 set(ADC_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/adc/test")
 set(COLLECTOR_EVENTS_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_events/test"
@@ -45,6 +48,7 @@ set(MACHINE_DEMAND_SOURCE_TEST_DIR
 idf_component_register(
     SRCS
         "test_main.cpp"
+        "${DEMAND_AGGREGATOR_TEST_DIR}/test_demand_aggregator.cpp"
         "${ADC_TEST_DIR}/test_adc_sampler.cpp"
         "${COLLECTOR_EVENTS_TEST_DIR}/test_collector_events.cpp"
         "${COLLECTOR_COMMANDS_TEST_DIR}/test_collector_commands.cpp"
@@ -65,6 +69,7 @@ idf_component_register(
         "${MACHINE_DEMAND_SOURCE_TEST_DIR}/test_machine_demand_source.cpp"
     PRIV_REQUIRES
         unity
+        demand_aggregator
         adc
         collector_api
         collector_commands
