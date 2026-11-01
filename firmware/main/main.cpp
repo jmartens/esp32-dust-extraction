@@ -83,10 +83,13 @@ extern "C" void app_main(void) {
   }
 
   static collector_service::CollectorService service(
-      dispatcher, event_dispatcher, unit, *uid, ids, [] {
+      dispatcher, event_dispatcher, unit, *uid, ids,
+      [] {
         return std::chrono::time_point_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now());
-      });
+      },
+      std::chrono::milliseconds{
+          CONFIG_OPEN_EXTRACTION_COLLECTOR_START_DELAY_MS});
   static collector_api::CollectorApi api(service);
   static http_server::HttpServer server(
       {.port = static_cast<std::uint16_t>(CONFIG_OPEN_EXTRACTION_HTTP_PORT)},

@@ -13,6 +13,12 @@ enum class CollectorState : std::uint8_t {
   faulted,
 };
 
+enum class CollectorMode : std::uint8_t {
+  automatic,
+  forced_on,
+  forced_off,
+};
+
 enum class CollectorCapability : std::uint8_t {
   start_stop,
   fault_reporting,

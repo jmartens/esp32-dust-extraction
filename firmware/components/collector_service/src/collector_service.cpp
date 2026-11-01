@@ -1,5 +1,6 @@
 #include "open_extraction/collector_service/collector_service.hpp"
 
+#include <algorithm>
 #include <string>
 #include <utility>
 
@@ -15,18 +16,31 @@ CollectorService::CollectorService(
     command_dispatcher::CommandDispatcher &dispatcher,
     event_dispatcher::EventDispatcher &event_dispatcher,
     const collector_unit::ICollectorUnit &unit, event::DeviceUid device_uid,
-    event::EventIdGenerator &id_generator, Clock clock)
+    event::EventIdGenerator &id_generator, Clock clock,
+    std::chrono::milliseconds start_delay)
     : dispatcher_(dispatcher), event_dispatcher_(event_dispatcher), unit_(unit),
       device_uid_(std::move(device_uid)), id_generator_(id_generator),
-      clock_(std::move(clock)) {}
+      clock_(std::move(clock)),
+      start_delay_(std::max(start_delay, std::chrono::milliseconds::zero())) {}
 
 CollectorState CollectorService::state() const { return unit_.state(); }
+
+collector_unit::CollectorMode CollectorService::mode() const { return mode_; }
 
 std::string CollectorService::device_uid() const {
   return std::string(device_uid_.value());
 }
 
+bool CollectorService::demand_active() const { return demand_active_; }
+
+bool CollectorService::demand_suppressed() const {
+  return mode_ == collector_unit::CollectorMode::forced_off && demand_active_;
+}
+
 bool CollectorService::request_start() {
+  if (mode_ == collector_unit::CollectorMode::forced_off) {
+    return false;
+  }
   if (unit_.state() != CollectorState::stopped) {
     return false;
   }
@@ -34,10 +48,95 @@ bool CollectorService::request_start() {
 }
 
 bool CollectorService::request_stop() {
+  if (mode_ == collector_unit::CollectorMode::forced_on) {
+    return false;
+  }
   if (unit_.state() != CollectorState::running) {
     return false;
   }
   return dispatch_command<collector_commands::StopCollector>();
+}
+
+bool CollectorService::request_mode(collector_unit::CollectorMode requested) {
+  using collector_unit::CollectorMode;
+  if (requested != CollectorMode::automatic &&
+      requested != CollectorMode::forced_on &&
+      requested != CollectorMode::forced_off) {
+    return false;
+  }
+
+  const CollectorMode previous_mode = mode_;
+  const auto previous_pending_demand_since = pending_demand_since_;
+  const bool changed = mode_ != requested;
+  if (changed) {
+    mode_ = requested;
+    pending_demand_since_.reset();
+  }
+
+  // Returning to AUTO with existing demand is a mode transition, not new
+  // demand, so it deliberately bypasses the start delay.
+  if (reconcile(changed && requested == CollectorMode::automatic &&
+                demand_active_)) {
+    return true;
+  }
+  if (changed) {
+    mode_ = previous_mode;
+    pending_demand_since_ = previous_pending_demand_since;
+  }
+  return false;
+}
+
+bool CollectorService::update_demand(bool active) {
+  if (demand_active_ != active) {
+    demand_active_ = active;
+    if (active && mode_ == collector_unit::CollectorMode::automatic) {
+      pending_demand_since_ = clock_();
+    } else if (!active) {
+      pending_demand_since_.reset();
+    }
+  }
+  return reconcile();
+}
+
+bool CollectorService::process() { return reconcile(); }
+
+bool CollectorService::reconcile(bool automatic_start_immediate) {
+  using collector_unit::CollectorMode;
+
+  if (mode_ == CollectorMode::forced_on) {
+    return unit_.state() == CollectorState::stopped ? request_start() : true;
+  }
+  if (mode_ == CollectorMode::forced_off) {
+    return unit_.state() == CollectorState::running ? request_stop() : true;
+  }
+
+  if (!demand_active_) {
+    pending_demand_since_.reset();
+    return unit_.state() == CollectorState::running ? request_stop() : true;
+  }
+
+  if (automatic_start_immediate) {
+    pending_demand_since_.reset();
+    return unit_.state() == CollectorState::stopped ? request_start() : true;
+  }
+
+  if (!pending_demand_since_.has_value()) {
+    return unit_.state() == CollectorState::stopped ? request_start() : true;
+  }
+
+  if (clock_() - *pending_demand_since_ < start_delay_) {
+    return true;
+  }
+
+  if (unit_.state() != CollectorState::stopped) {
+    pending_demand_since_.reset();
+    return true;
+  }
+  if (request_start()) {
+    pending_demand_since_.reset();
+    return true;
+  }
+  return false;
 }
 
 void CollectorService::report_fault(std::string reason) {
