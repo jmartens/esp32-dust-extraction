@@ -56,8 +56,7 @@ TEST_CASE("duplicate starts are idempotent", "[demand_aggregator]") {
   TEST_ASSERT_FALSE(aggregator.has_demand());
 }
 
-TEST_CASE("duplicate and unknown stops are idempotent",
-          "[demand_aggregator]") {
+TEST_CASE("duplicate and unknown stops are idempotent", "[demand_aggregator]") {
   DemandAggregator aggregator;
 
   TEST_ASSERT_FALSE(aggregator.stop("unknown"));
