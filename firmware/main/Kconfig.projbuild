@@ -8,6 +8,15 @@ menu "Open Extraction"
             TCP port the collector HTTP interface (control page and
             /api/v1/collector) listens on.
 
+    config OPEN_EXTRACTION_COLLECTOR_START_DELAY_MS
+        int "Collector automatic start delay (milliseconds)"
+        range 0 60000
+        default 1000
+        help
+            Delay before starting the collector after new automatic demand.
+            Manual override transitions to AUTO with active demand start
+            immediately, regardless of this delay.
+
     config OPEN_EXTRACTION_COLLECTOR_RELAY_GPIO
         int "Collector relay GPIO pin"
         range 0 33

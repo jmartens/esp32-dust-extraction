@@ -20,6 +20,7 @@ using open_extraction::collector_events::CollectorFault;
 using open_extraction::collector_service::CollectorService;
 using open_extraction::collector_unit::CollectorCapability;
 using open_extraction::collector_unit::CollectorDiagnostics;
+using open_extraction::collector_unit::CollectorMode;
 using open_extraction::collector_unit::CollectorState;
 using open_extraction::collector_unit::ICollectorUnit;
 using open_extraction::command::Command;
@@ -75,6 +76,7 @@ struct Fixture {
   std::vector<std::string> received_fault_ids;
   std::vector<std::string> received_fault_devices;
   bool deliver = true;
+  Timestamp now = kNow;
 
   Fixture() {
     TEST_ASSERT_TRUE(dispatcher.register_recipient(
@@ -98,10 +100,11 @@ struct Fixture {
         });
   }
 
-  CollectorService service() {
-    return CollectorService(dispatcher, event_dispatcher, unit,
-                            DeviceUid::from_string(std::string(kUid)).value(),
-                            ids, [] { return kNow; });
+  CollectorService service(std::chrono::milliseconds start_delay = {}) {
+    return CollectorService(
+        dispatcher, event_dispatcher, unit,
+        DeviceUid::from_string(std::string(kUid)).value(), ids,
+        [this] { return now; }, start_delay);
   }
 };
 
@@ -210,5 +213,151 @@ TEST_CASE("report_fault publishes an immutable fault event with its reason",
                            f.received_fault_devices[0].c_str());
   TEST_ASSERT_EQUAL_INT(static_cast<int>(CollectorState::stopped),
                         static_cast<int>(service.state()));
+  TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
+}
+
+TEST_CASE("forced on starts the collector without machine demand",
+          "[collector_service]") {
+  Fixture f;
+  CollectorService service = f.service();
+
+  TEST_ASSERT_TRUE(service.request_mode(CollectorMode::forced_on));
+
+  TEST_ASSERT_EQUAL_INT(static_cast<int>(CollectorMode::forced_on),
+                        static_cast<int>(service.mode()));
+  TEST_ASSERT_FALSE(service.demand_active());
+  TEST_ASSERT_FALSE(service.demand_suppressed());
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StartCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+}
+
+TEST_CASE("failed override dispatch leaves the previous mode selected",
+          "[collector_service]") {
+  Fixture f;
+  f.deliver = false;
+  CollectorService service = f.service();
+
+  TEST_ASSERT_FALSE(service.request_mode(CollectorMode::forced_on));
+
+  TEST_ASSERT_EQUAL_INT(static_cast<int>(CollectorMode::automatic),
+                        static_cast<int>(service.mode()));
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StartCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+}
+
+TEST_CASE("forced on keeps the collector on when machine demand is active",
+          "[collector_service]") {
+  Fixture f;
+  CollectorService service = f.service(std::chrono::milliseconds(500));
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  TEST_ASSERT_TRUE(service.request_mode(CollectorMode::forced_on));
+
+  TEST_ASSERT_EQUAL_INT(static_cast<int>(CollectorMode::forced_on),
+                        static_cast<int>(service.mode()));
+  TEST_ASSERT_TRUE(service.demand_active());
+  TEST_ASSERT_FALSE(service.demand_suppressed());
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StartCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+}
+
+TEST_CASE("forced off stops output and exposes active demand as suppressed",
+          "[collector_service]") {
+  Fixture f;
+  f.unit.current = CollectorState::running;
+  CollectorService service = f.service();
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  TEST_ASSERT_TRUE(service.request_mode(CollectorMode::forced_off));
+
+  TEST_ASSERT_EQUAL_INT(static_cast<int>(CollectorMode::forced_off),
+                        static_cast<int>(service.mode()));
+  TEST_ASSERT_TRUE(service.demand_active());
+  TEST_ASSERT_TRUE(service.demand_suppressed());
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StopCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+}
+
+TEST_CASE("forced off suppresses an automatic start despite active demand",
+          "[collector_service]") {
+  Fixture f;
+  CollectorService service = f.service();
+
+  TEST_ASSERT_TRUE(service.request_mode(CollectorMode::forced_off));
+  TEST_ASSERT_TRUE(service.update_demand(true));
+
+  TEST_ASSERT_EQUAL_INT(static_cast<int>(CollectorMode::forced_off),
+                        static_cast<int>(service.mode()));
+  TEST_ASSERT_TRUE(service.demand_active());
+  TEST_ASSERT_TRUE(service.demand_suppressed());
+  TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
+  TEST_ASSERT_EQUAL_INT(static_cast<int>(CollectorState::stopped),
+                        static_cast<int>(service.state()));
+}
+
+TEST_CASE("automatic mode delays only newly active demand until delay expires",
+          "[collector_service]") {
+  Fixture f;
+  CollectorService service = f.service(std::chrono::milliseconds(500));
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
+  TEST_ASSERT_TRUE(service.demand_active());
+  TEST_ASSERT_FALSE(service.demand_suppressed());
+
+  f.now += std::chrono::milliseconds(499);
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
+
+  f.now += std::chrono::milliseconds(1);
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StartCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+}
+
+TEST_CASE("returning to automatic starts active demand without start delay",
+          "[collector_service]") {
+  Fixture f;
+  CollectorService service = f.service(std::chrono::milliseconds(1'000));
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  TEST_ASSERT_TRUE(service.request_mode(CollectorMode::forced_off));
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
+  TEST_ASSERT_TRUE(service.demand_active());
+  TEST_ASSERT_TRUE(service.demand_suppressed());
+
+  TEST_ASSERT_TRUE(service.request_mode(CollectorMode::automatic));
+
+  TEST_ASSERT_EQUAL_INT(static_cast<int>(CollectorMode::automatic),
+                        static_cast<int>(service.mode()));
+  TEST_ASSERT_TRUE(service.demand_active());
+  TEST_ASSERT_FALSE(service.demand_suppressed());
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StartCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+}
+
+TEST_CASE("released automatic demand cancels a pending delayed start",
+          "[collector_service]") {
+  Fixture f;
+  CollectorService service = f.service(std::chrono::milliseconds(500));
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  TEST_ASSERT_TRUE(service.process());
+  f.now += std::chrono::milliseconds(250);
+  TEST_ASSERT_TRUE(service.update_demand(false));
+  TEST_ASSERT_TRUE(service.process());
+  f.now += std::chrono::milliseconds(500);
+  TEST_ASSERT_TRUE(service.process());
+
+  TEST_ASSERT_FALSE(service.demand_active());
+  TEST_ASSERT_FALSE(service.demand_suppressed());
   TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
 }

@@ -409,7 +409,8 @@ modes.
 When returning to `AUTO` with active demand, the Collector SHALL start
 immediately; the configurable start delay applies to a new demand received
 while already in `AUTO`, not to demand accumulated during an override. Normal
-run-on behaviour applies after demand ends in `AUTO`.
+run-on behaviour applies after demand ends in `AUTO`. Manual mode SHALL NOT
+erase or modify Machine Unit demand state.
 
 ---
 

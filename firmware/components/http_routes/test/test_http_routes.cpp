@@ -11,6 +11,7 @@ namespace {
 
 using open_extraction::collector_api::CollectorApi;
 using open_extraction::collector_api::ICollectorControl;
+using open_extraction::collector_unit::CollectorMode;
 using open_extraction::collector_unit::CollectorState;
 using open_extraction::http_routes::make_request_handler;
 using open_extraction::http_server::HttpServer;
@@ -21,18 +22,33 @@ using open_extraction::http_server::Response;
 class FakeControl final : public ICollectorControl {
 public:
   CollectorState current = CollectorState::stopped;
+  CollectorMode current_mode = CollectorMode::automatic;
+  bool active_demand = false;
   bool accept = true;
   int starts = 0;
   int stops = 0;
+  int mode_requests = 0;
 
   CollectorState state() const override { return current; }
+  CollectorMode mode() const override { return current_mode; }
   std::string device_uid() const override { return "collector-01"; }
+  bool demand_active() const override { return active_demand; }
+  bool demand_suppressed() const override {
+    return current_mode == CollectorMode::forced_off && active_demand;
+  }
   bool request_start() override {
     ++starts;
     return accept;
   }
   bool request_stop() override {
     ++stops;
+    return accept;
+  }
+  bool request_mode(CollectorMode mode) override {
+    ++mode_requests;
+    if (accept) {
+      current_mode = mode;
+    }
     return accept;
   }
 };
@@ -81,8 +97,27 @@ TEST_CASE("GET collector state is forwarded as JSON", "[http_routes]") {
   TEST_ASSERT_EQUAL_INT(200, response.status);
   TEST_ASSERT_EQUAL_STRING("application/json", response.content_type.c_str());
   TEST_ASSERT_EQUAL_STRING(
-      "{\"state\":\"running\",\"device_uid\":\"collector-01\"}",
+      "{\"state\":\"running\",\"device_uid\":\"collector-01\","
+      "\"mode\":\"AUTO\",\"demand_active\":false,"
+      "\"demand_suppressed\":false}",
       response.body.c_str());
+}
+
+TEST_CASE("mode API routes are forwarded and query strings are ignored",
+          "[http_routes]") {
+  Fixture f;
+  f.control.active_demand = true;
+
+  const Response off = f.post("/api/v1/collector/mode/forced-off?source=panel");
+  TEST_ASSERT_EQUAL_INT(202, off.status);
+  TEST_ASSERT_EQUAL_INT(1, f.control.mode_requests);
+  TEST_ASSERT_EQUAL_INT(static_cast<int>(CollectorMode::forced_off),
+                        static_cast<int>(f.control.current_mode));
+  TEST_ASSERT_EQUAL_STRING(
+      "{\"state\":\"stopped\",\"device_uid\":\"collector-01\","
+      "\"mode\":\"FORCED_OFF\",\"demand_active\":true,"
+      "\"demand_suppressed\":true}",
+      off.body.c_str());
 }
 
 TEST_CASE("POST start and stop are forwarded with 202", "[http_routes]") {

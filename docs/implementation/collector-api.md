@@ -13,19 +13,30 @@ should poll `GET /api/v1/collector`.
 
 ## Endpoints
 
-| Method | Path                        | Success | Description                    |
-| ------ | --------------------------- | ------- | ------------------------------ |
-| GET    | `/api/v1/collector`         | 200     | Current collector state        |
-| POST   | `/api/v1/collector/start`   | 202     | Request that the collector start |
-| POST   | `/api/v1/collector/stop`    | 202     | Request that the collector stop  |
+| Method | Path                                   | Success | Description                       |
+| ------ | -------------------------------------- | ------- | --------------------------------- |
+| GET    | `/api/v1/collector`                    | 200     | Current collector state and mode  |
+| POST   | `/api/v1/collector/start`              | 202     | Request that the collector start  |
+| POST   | `/api/v1/collector/stop`               | 202     | Request that the collector stop   |
+| POST   | `/api/v1/collector/mode/auto`          | 202     | Select automatic operation        |
+| POST   | `/api/v1/collector/mode/forced-on`     | 202     | Force the collector output on     |
+| POST   | `/api/v1/collector/mode/forced-off`    | 202     | Force output off and suppress demand |
 
 ## Collector resource
 
 ```json
-{ "state": "stopped", "device_uid": "collector-01" }
+{ "state": "stopped", "device_uid": "collector-01", "mode": "AUTO",
+  "demand_active": false, "demand_suppressed": false }
 ```
 
 `state` is one of `stopped`, `starting`, `running`, `stopping`, `faulted`.
+`mode` is one of `AUTO`, `FORCED_ON`, or `FORCED_OFF`. A forced-off collector
+continues to report active demand with `demand_active: true` and
+`demand_suppressed: true`. `POST /api/v1/collector/mode/auto` immediately
+starts the collector when demand is already active. New demand observed while
+already in AUTO waits for the configured service start delay. Demand producers
+feed updates through `CollectorService::update_demand()`; call
+`CollectorService::process()` periodically to evaluate a pending start.
 For the relay-backed Collector Unit, these states describe the commanded
 relay/output state. `running` means the relay has been commanded on; it does
 not confirm that the motor is physically running because no motor-feedback
@@ -45,6 +56,7 @@ Configure the relay under **Open Extraction** in `idf.py menuconfig`:
 | ------- | ------- | ----------- |
 | Collector relay GPIO pin | GPIO 26 | Output pin connected to the relay |
 | Collector relay polarity | Active high | Select active high or active low |
+| Collector automatic start delay | 1000 ms | Delay for new demand while already in AUTO; returning to AUTO with active demand starts immediately |
 
 Choose an output-capable pin that is not reserved by the board or flash
 interface. The ESP relay driver presets the GPIO's off level before enabling
@@ -60,6 +72,9 @@ Errors use the body `{ "error": "<message>" }`.
 | 404    | Unknown path                                              |
 | 405    | Method not supported for the path                         |
 | 409    | Request not permitted in the current collector state      |
+
+If the corresponding output command cannot be delivered, the API returns 409
+and leaves the previous mode selected.
 
 ## Collector service
 

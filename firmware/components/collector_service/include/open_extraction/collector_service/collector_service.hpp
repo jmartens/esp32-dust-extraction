@@ -1,6 +1,8 @@
 #pragma once
 
+#include <chrono>
 #include <functional>
+#include <optional>
 #include <string>
 
 #include "collector_unit/collector_unit.hpp"
@@ -24,16 +26,26 @@ public:
                    event_dispatcher::EventDispatcher &event_dispatcher,
                    const collector_unit::ICollectorUnit &unit,
                    event::DeviceUid device_uid,
-                   event::EventIdGenerator &id_generator, Clock clock);
+                   event::EventIdGenerator &id_generator, Clock clock,
+                   std::chrono::milliseconds start_delay = {});
 
   [[nodiscard]] collector_unit::CollectorState state() const override;
+  [[nodiscard]] collector_unit::CollectorMode mode() const override;
   [[nodiscard]] std::string device_uid() const override;
+  [[nodiscard]] bool demand_active() const override;
+  [[nodiscard]] bool demand_suppressed() const override;
 
   // Return true only when the command was delivered to the collector. The
   // request is rejected without dispatching when the observed state does not
   // permit it (start from stopped, stop from running).
   [[nodiscard]] bool request_start() override;
   [[nodiscard]] bool request_stop() override;
+  [[nodiscard]] bool request_mode(collector_unit::CollectorMode mode) override;
+
+  // Demand remains observable during an override. Call process() periodically
+  // to release a pending automatic start after the configured delay.
+  [[nodiscard]] bool update_demand(bool active);
+  [[nodiscard]] bool process();
 
   // Publishes a CollectorFault Domain Event. State handling remains the
   // responsibility of the service that consumes the event.
@@ -48,6 +60,13 @@ private:
   event::DeviceUid device_uid_;
   event::EventIdGenerator &id_generator_;
   Clock clock_;
+  std::chrono::milliseconds start_delay_;
+  collector_unit::CollectorMode mode_ =
+      collector_unit::CollectorMode::automatic;
+  bool demand_active_ = false;
+  std::optional<event::Timestamp> pending_demand_since_;
+
+  [[nodiscard]] bool reconcile(bool automatic_start_immediate = false);
 };
 
 } // namespace open_extraction::collector_service
