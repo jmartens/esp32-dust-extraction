@@ -27,6 +27,7 @@ behavioral and protocol documentation.
 - [Coding Standard](implementation/coding-standard.md)
 - [Repository Layout](implementation/repository-layout.md)
 - [Testing](implementation/testing.md)
+- [CT Test Fixture](implementation/ct-test-fixture.md)
 
 ## Documentation Authority
 
