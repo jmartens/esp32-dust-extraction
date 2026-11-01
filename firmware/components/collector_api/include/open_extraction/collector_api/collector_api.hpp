@@ -21,10 +21,15 @@ public:
   virtual ~ICollectorControl() = default;
 
   [[nodiscard]] virtual collector_unit::CollectorState state() const = 0;
+  [[nodiscard]] virtual collector_unit::CollectorMode mode() const = 0;
   [[nodiscard]] virtual std::string device_uid() const = 0;
+  [[nodiscard]] virtual bool demand_active() const = 0;
+  [[nodiscard]] virtual bool demand_suppressed() const = 0;
   // Return true when the request was accepted for processing.
   [[nodiscard]] virtual bool request_start() = 0;
   [[nodiscard]] virtual bool request_stop() = 0;
+  [[nodiscard]] virtual bool
+  request_mode(collector_unit::CollectorMode mode) = 0;
 };
 
 [[nodiscard]] std::string_view
