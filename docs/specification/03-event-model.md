@@ -126,6 +126,12 @@ Examples:
 - MachineDemandStopped
 - MachineFault
 
+`MachineDemandStarted` and `MachineDemandStopped` SHALL identify the
+originating Unit using its Device UID and Unit Identifier. Each event SHALL
+include a unique Event ID and timestamp. A Machine Unit SHALL emit these
+events only when its debounced demand state changes; repeated measurements
+that leave the state unchanged SHALL NOT generate duplicate transitions.
+
 ---
 
 ## Gate Units
@@ -146,6 +152,10 @@ Examples:
 
 - CollectorStarted
 - CollectorStopped
+
+For a Collector Unit without motor-feedback hardware, `CollectorStarted` and
+`CollectorStopped` SHALL describe the commanded output state only. They SHALL
+NOT imply that the collector motor physically started or stopped.
 
 `CollectorFault` SHALL include an immutable `reason` string describing the
 business-significant fault. Its event representation SHALL serialize this

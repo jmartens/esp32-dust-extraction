@@ -252,12 +252,16 @@ Stopped
 
 The Collector Unit's commanded output is off. Without motor-feedback hardware,
 this state does not confirm that the collector motor is physically stopped.
+`CollectorStopped` reports that the output was commanded off; it SHALL NOT be
+interpreted as confirmation that the motor stopped.
 
 ---
 
 ## Starting
 
-StartCollector Command has been issued.
+StartCollector Command has been issued. `CollectorStarted` reports that the
+Collector Unit's output was commanded on; without motor-feedback hardware, it
+SHALL NOT be interpreted as confirmation that the motor started.
 
 ---
 
@@ -276,9 +280,32 @@ Run-on timer is active.
 
 ---
 
+## Automatic Start Delay
+
+In `AUTO` mode, a new aggregate demand SHALL begin a configurable start delay
+before the Collector output is commanded on. The default delay SHALL be one
+second; zero SHALL be valid. If demand ends before the delay expires, the
+pending start SHALL be cancelled. Returning to `AUTO` with demand already
+active SHALL command the output on immediately.
+
+---
+
 ## Stopping
 
 StopCollector Command has been issued.
+
+---
+
+## Collector Fault
+
+A Collector fault SHALL be latched by the Collector Service. Automatic start
+and stop commands SHALL NOT be retried while the fault is active. Recovery
+requires an explicit operator reset. After reset, the Collector Service SHALL
+return to Stopped and reevaluate current demand.
+
+Without motor-feedback hardware, the Controller cannot detect a motor that
+fails to start, stalls, or continues running after the output is commanded off.
+These conditions SHALL NOT be reported as detected faults.
 
 ---
 
@@ -370,11 +397,19 @@ Intermediate transitions SHALL NOT generate Commands.
 
 # Manual Override
 
-Manual Override SHALL temporarily suspend automatic behaviour.
+The Collector Service SHALL support `AUTO`, `FORCED_ON`, and `FORCED_OFF`
+modes.
 
-Controller Services SHALL preserve internal state while Manual Override is active.
+- `AUTO` applies automatic control to aggregated machine demand.
+- `FORCED_ON` commands the Collector output on regardless of machine demand.
+- `FORCED_OFF` commands the Collector output off and suppresses automatic
+  starts, even while machine demand is active. The active demand SHALL remain
+  observable so the operator can see that extraction is being suppressed.
 
-Automatic operation SHALL resume after Manual Override is released.
+When returning to `AUTO` with active demand, the Collector SHALL start
+immediately; the configurable start delay applies to a new demand received
+while already in `AUTO`, not to demand accumulated during an override. Normal
+run-on behaviour applies after demand ends in `AUTO`.
 
 ---
 

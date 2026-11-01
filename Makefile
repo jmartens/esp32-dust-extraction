@@ -1,5 +1,8 @@
 # Containerised ESP-IDF workflow (Linux/macOS). Windows: scripts/idf-docker.ps1.
 # The IDF image tag is pinned in scripts/idf-version (single source of truth).
+# Git Bash (MSYS) would rewrite /project/... arguments into Windows paths.
+export MSYS_NO_PATHCONV := 1
+
 IDF_VERSION  := $(shell cat scripts/idf-version)
 IDF_IMAGE    ?= espressif/idf:$(IDF_VERSION)
 IDF_TARGET   ?= esp32
@@ -26,13 +29,14 @@ help:
 	@echo "Targets: build test clean shell menuconfig flash monitor"
 	@echo "Image: $(IDF_IMAGE)  (edit scripts/idf-version to change)"
 
-# Named volumes are created root-owned; hand them to the host user once.
+# Named volumes are created root-owned; hand them to the host user. Recursive so
+# volumes previously used by scripts/idf-docker.ps1 (root) self-heal.
 volumes:
 	@for v in $(BUILD_VOLUME) $(CCACHE_VOLUME); do \
 		docker volume create $$v >/dev/null; \
 	done
 	@docker run --rm -u 0 -v $(BUILD_VOLUME):/build -v $(CCACHE_VOLUME):/ccache \
-		$(IDF_IMAGE) chown $(HOST_UID):$(HOST_GID) /build /ccache
+		$(IDF_IMAGE) chown -R $(HOST_UID):$(HOST_GID) /build /ccache
 
 build: volumes
 	$(DOCKER_RUN) $(IDF_IMAGE) idf.py -B /build/$(IDF_TARGET) set-target $(IDF_TARGET)
