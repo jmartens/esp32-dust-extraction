@@ -18,6 +18,10 @@ install is needed and every developer (and CI) uses the same toolchain.
 Run commands from the repository root. Only Docker is required. `test` runs
 `firmware/test/run_coverage.sh` (the script CI runs) and writes reports to `firmware/test/coverage/`.
 
+On Windows, `make` also works from Git Bash (the Makefile disables MSYS path conversion); the
+PowerShell wrapper is the native option. Switching between the two is safe: `make volumes` recursively
+re-owns the build/ccache volumes, so root-owned files left by the PowerShell wrapper self-heal.
+
 ## Design
 
 * **Pinned image**: the tag lives only in `scripts/idf-version` (currently `v6.1`, matching
