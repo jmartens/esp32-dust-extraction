@@ -1,8 +1,38 @@
-{
+﻿{
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:best-practices"],
   "dependencyDashboard": true,
   "labels": ["dependencies"],
   "prConcurrentLimit": 5,
-  "prHourlyLimit": 2
+  "prHourlyLimit": 2,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^scripts/idf-version$/"],
+      "matchStrings": ["^(?<currentValue>v\\d+\\.\\d+(?:\\.\\d+)?)\\s*$"],
+      "depNameTemplate": "espressif/idf",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/build\\.yml$/"],
+      "matchStrings": ["esp_idf_version: (?<currentValue>v\\d+\\.\\d+(?:\\.\\d+)?)"],
+      "depNameTemplate": "espressif/idf",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "loose"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": ["espressif/idf"],
+      "groupName": "esp-idf toolchain image",
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchDepNames": ["espressif/idf"],
+      "matchUpdateTypes": ["patch"],
+      "dependencyDashboardApproval": false
+    }
+  ]
 }
