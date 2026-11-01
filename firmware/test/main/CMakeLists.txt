@@ -1,6 +1,10 @@
 set(OPEN_EXTRACTION_COMPONENTS_DIR
     "${CMAKE_CURRENT_LIST_DIR}/../../components"
 )
+set(DEMAND_AGGREGATOR_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/demand_aggregator/test"
+)
+set(ADC_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/adc/test")
 set(COLLECTOR_EVENTS_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/collector_events/test"
 )
@@ -37,10 +41,15 @@ set(EVENT_JSON_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/event_json/test")
 set(HTTP_SERVER_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/http_server/test")
 set(HTTP_ROUTES_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/http_routes/test")
 set(RELAY_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/relay/test")
+set(MACHINE_DEMAND_SOURCE_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/machine_demand_source/test"
+)
 
 idf_component_register(
     SRCS
         "test_main.cpp"
+        "${DEMAND_AGGREGATOR_TEST_DIR}/test_demand_aggregator.cpp"
+        "${ADC_TEST_DIR}/test_adc_sampler.cpp"
         "${COLLECTOR_EVENTS_TEST_DIR}/test_collector_events.cpp"
         "${COLLECTOR_COMMANDS_TEST_DIR}/test_collector_commands.cpp"
         "${COLLECTOR_API_TEST_DIR}/test_collector_api.cpp"
@@ -57,8 +66,11 @@ idf_component_register(
         "${HTTP_ROUTES_TEST_DIR}/test_http_routes.cpp"
         "${HTTP_SERVER_TEST_DIR}/test_http_server.cpp"
         "${RELAY_TEST_DIR}/test_relay_driver.cpp"
+        "${MACHINE_DEMAND_SOURCE_TEST_DIR}/test_machine_demand_source.cpp"
     PRIV_REQUIRES
         unity
+        demand_aggregator
+        adc
         collector_api
         collector_commands
         collector_events
@@ -75,6 +87,7 @@ idf_component_register(
         event_json
         http_routes
         http_server
+        machine_demand_source
         relay
     WHOLE_ARCHIVE
 )
