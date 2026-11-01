@@ -22,7 +22,7 @@ Run commands from the repository root. Only Docker is required. `test` runs
 
 * **Pinned image**: the tag lives only in `scripts/idf-version` (currently `v6.1`, matching
   `esp_idf_version` in `.github/workflows/build.yml`). Both wrappers read it. To switch versions,
-  edit that file (and the workflow) in one change; `IDF_IMAGE` overrides the full image name.
+  edit that file (and the workflow) in one change (Renovate does this: custom regex managers in `renovate.json` track both as `espressif/idf` in one grouped PR; minor/major bumps need approval on the dependency dashboard); `IDF_IMAGE` overrides the full image name.
 * **Working directory**: the project root is mounted at `/project` and commands run in
   `/project/firmware` (or `/project/firmware/test`), because the root is not an IDF project.
 * **Container-local build output**: builds use `-B /build/<target>` on a named volume
