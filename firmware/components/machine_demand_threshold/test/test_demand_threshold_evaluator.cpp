@@ -14,33 +14,33 @@ using open_extraction::machine_demand_threshold::MachineDemandThresholdProfile;
 
 TEST_CASE("demand threshold profile requires finite ordered thresholds",
           "[machine_demand_threshold]") {
-  TEST_ASSERT_TRUE(open_extraction::machine_demand_threshold::is_valid(
-      {8.0F, 2.0F}));
-  TEST_ASSERT_TRUE(open_extraction::machine_demand_threshold::is_valid(
-      {8.0F, 0.0F}));
-  TEST_ASSERT_FALSE(open_extraction::machine_demand_threshold::is_valid(
-      {0.0F, 0.0F}));
-  TEST_ASSERT_FALSE(open_extraction::machine_demand_threshold::is_valid(
-      {2.0F, 2.0F}));
-  TEST_ASSERT_FALSE(open_extraction::machine_demand_threshold::is_valid(
-      {2.0F, 3.0F}));
+  TEST_ASSERT_TRUE(
+      open_extraction::machine_demand_threshold::is_valid({8.0F, 2.0F}));
+  TEST_ASSERT_TRUE(
+      open_extraction::machine_demand_threshold::is_valid({8.0F, 0.0F}));
+  TEST_ASSERT_FALSE(
+      open_extraction::machine_demand_threshold::is_valid({0.0F, 0.0F}));
+  TEST_ASSERT_FALSE(
+      open_extraction::machine_demand_threshold::is_valid({2.0F, 2.0F}));
+  TEST_ASSERT_FALSE(
+      open_extraction::machine_demand_threshold::is_valid({2.0F, 3.0F}));
   TEST_ASSERT_FALSE(open_extraction::machine_demand_threshold::is_valid(
       {std::numeric_limits<float>::infinity(), 2.0F}));
   TEST_ASSERT_FALSE(open_extraction::machine_demand_threshold::is_valid(
       {8.0F, std::numeric_limits<float>::quiet_NaN()}));
-  TEST_ASSERT_FALSE(open_extraction::machine_demand_threshold::is_valid(
-      {8.0F, -1.0F}));
+  TEST_ASSERT_FALSE(
+      open_extraction::machine_demand_threshold::is_valid({8.0F, -1.0F}));
 }
 
 TEST_CASE("demand threshold evaluator rejects missing and invalid profiles",
           "[machine_demand_threshold]") {
   const std::optional<MachineDemandThresholdProfile> missing_profile;
 
-  TEST_ASSERT_FALSE(DemandThresholdEvaluator::create(missing_profile)
-                       .has_value());
   TEST_ASSERT_FALSE(
-      DemandThresholdEvaluator::create(MachineDemandThresholdProfile{2.0F, 3.0F})
-          .has_value());
+      DemandThresholdEvaluator::create(missing_profile).has_value());
+  TEST_ASSERT_FALSE(DemandThresholdEvaluator::create(
+                        MachineDemandThresholdProfile{2.0F, 3.0F})
+                        .has_value());
 }
 
 TEST_CASE("demand threshold evaluator starts at the configured start threshold",
