@@ -5,17 +5,11 @@
 namespace open_extraction::controller_configuration_service {
 namespace {
 
-[[nodiscard]] ConfigurationResult
-to_configuration_result(const ProfileStorageResult result) {
-  switch (result) {
-  case ProfileStorageResult::success:
-    return ConfigurationResult::success;
-  case ProfileStorageResult::not_found:
-    return ConfigurationResult::not_found;
-  case ProfileStorageResult::error:
-    return ConfigurationResult::storage_error;
-  }
-  return ConfigurationResult::storage_error;
+[[nodiscard]] constexpr ConfigurationResult
+to_configuration_result(const ProfileStorageResult result) noexcept {
+  return result == ProfileStorageResult::not_found
+             ? ConfigurationResult::not_found
+             : ConfigurationResult::storage_error;
 }
 
 } // namespace
