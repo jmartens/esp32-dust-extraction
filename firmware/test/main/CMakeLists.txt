@@ -47,6 +47,12 @@ set(MACHINE_DEMAND_SOURCE_TEST_DIR
 set(CURRENT_TRANSFORMER_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/current_transformer/test"
 )
+set(MACHINE_DEMAND_THRESHOLD_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/machine_demand_threshold/test"
+)
+set(MACHINE_DEMAND_THRESHOLD_TEST_SOURCE
+    "${MACHINE_DEMAND_THRESHOLD_TEST_DIR}/test_demand_threshold_evaluator.cpp"
+)
 
 idf_component_register(
     SRCS
@@ -71,6 +77,7 @@ idf_component_register(
         "${RELAY_TEST_DIR}/test_relay_driver.cpp"
         "${MACHINE_DEMAND_SOURCE_TEST_DIR}/test_machine_demand_source.cpp"
         "${CURRENT_TRANSFORMER_TEST_DIR}/test_current_transformer.cpp"
+        "${MACHINE_DEMAND_THRESHOLD_TEST_SOURCE}"
     PRIV_REQUIRES
         unity
         demand_aggregator
@@ -93,6 +100,7 @@ idf_component_register(
         http_server
         machine_demand_source
         current_transformer
+        machine_demand_threshold
         relay
     WHOLE_ARCHIVE
 )
