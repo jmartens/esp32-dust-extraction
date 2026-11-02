@@ -7,8 +7,11 @@ secondary voltage, then uses the burden resistance and CT turns ratio to
 report primary RMS current.
 
 Configure the primary-to-secondary turns ratio, burden resistance in ohms,
-ADC volts per count, and sample count for the hardware profile. A CT without an
-integrated burden requires an external burden resistor.
+ADC volts per count, and sample count for the hardware profile. The sample
+count sets the number of conversions in each RMS reading; its duration is
+determined by the ADC sampler's configured rate. Choose a window spanning
+whole AC cycles to avoid waveform truncation error. A CT without an integrated
+burden requires an external burden resistor.
 
 Calibration is runtime input through `apply_calibration`, using the
 Controller-owned Machine Unit profile's `CalibrationState`. The sensor neither

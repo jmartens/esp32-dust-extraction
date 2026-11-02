@@ -1,4 +1,5 @@
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -31,6 +32,8 @@ public:
     }
     return samples_[reads_++];
   }
+
+  [[nodiscard]] std::size_t reads() const { return reads_; }
 
 private:
   const std::uint16_t *samples_;
@@ -84,6 +87,36 @@ TEST_CASE("current transformer converts offset ADC samples to primary RMS",
 
   TEST_ASSERT_TRUE(current.has_value());
   TEST_ASSERT_FLOAT_WITHIN(0.001F, 70.710678F, *current);
+}
+
+TEST_CASE("current transformer calculates sine RMS within five percent",
+          "[current_transformer]") {
+  constexpr std::size_t configured_window = 100;
+  constexpr double sample_rate_hz = 1000.0;
+  constexpr double frequency_hz = 50.0;
+  constexpr double pi = 3.14159265358979323846;
+  std::array<std::uint16_t, configured_window * 2> samples{};
+  for (std::size_t index = 0; index < configured_window; ++index) {
+    const double phase =
+        2.0 * pi * frequency_hz * static_cast<double>(index) / sample_rate_hz;
+    samples[index] =
+        static_cast<std::uint16_t>(2048 + std::lround(100.0 * std::sin(phase)));
+  }
+  for (std::size_t index = configured_window; index < samples.size(); ++index) {
+    samples[index] = 2548;
+  }
+
+  FakeAdcSampler sampler(samples.data(), samples.size());
+  CurrentTransformer transformer(sampler,
+                                 {100.0, 10.0, 0.01, configured_window});
+
+  const auto current = transformer.read_current_rms();
+
+  TEST_ASSERT_TRUE(current.has_value());
+  constexpr float expected_current_rms = 7.071068F;
+  TEST_ASSERT_FLOAT_WITHIN(expected_current_rms * 0.05F, expected_current_rms,
+                           *current);
+  TEST_ASSERT_EQUAL_size_t(configured_window, sampler.reads());
 }
 
 TEST_CASE("current transformer supports arbitrary ratios and burden values",
