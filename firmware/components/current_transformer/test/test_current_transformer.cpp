@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <optional>
 
 #include "adc/adc_sampler.hpp"
@@ -232,4 +233,141 @@ TEST_CASE("current transformer rejects invalid configuration and calibration",
 
   TEST_ASSERT_FALSE(invalid_config.read_current_rms().has_value());
   TEST_ASSERT_FALSE(invalid_calibration.read_current_rms().has_value());
+}
+
+TEST_CASE("current transformer keeps calibration independent per Machine Unit",
+          "[current_transformer]") {
+  constexpr std::array<std::uint16_t, 2> samples{900, 1100};
+  FakeAdcSampler first_sampler(samples.data(), samples.size());
+  FakeAdcSampler second_sampler(samples.data(), samples.size());
+  CurrentTransformer first(first_sampler, {100.0, 10.0, 0.01, samples.size()});
+  CurrentTransformer second(second_sampler,
+                            {100.0, 10.0, 0.01, samples.size()});
+
+  first.apply_calibration({true, 2.0F});
+  second.apply_calibration({true, 3.0F});
+  const auto first_current = first.read_current_rms();
+  const auto second_current = second.read_current_rms();
+
+  TEST_ASSERT_TRUE(first_current.has_value());
+  TEST_ASSERT_TRUE(second_current.has_value());
+  TEST_ASSERT_FLOAT_WITHIN(0.001F, 20.0F, *first_current);
+  TEST_ASSERT_FLOAT_WITHIN(0.001F, 30.0F, *second_current);
+  TEST_ASSERT_TRUE(first.calibration() == (CalibrationState{true, 2.0F}));
+  TEST_ASSERT_TRUE(second.calibration() == (CalibrationState{true, 3.0F}));
+}
+
+TEST_CASE("current transformer retains no calibration across a restart until "
+          "the Controller supplies it again",
+          "[current_transformer]") {
+  constexpr std::array<std::uint16_t, 2> samples{900, 1100};
+  const CalibrationState controller_profile{true, 2.5F};
+  {
+    FakeAdcSampler before_sampler(samples.data(), samples.size());
+    CurrentTransformer before_restart(before_sampler,
+                                      {100.0, 10.0, 0.01, samples.size()});
+    before_restart.apply_calibration(controller_profile);
+    TEST_ASSERT_TRUE(before_restart.calibration() == controller_profile);
+  }
+
+  FakeAdcSampler after_sampler(samples.data(), samples.size());
+  CurrentTransformer after_restart(after_sampler,
+                                   {100.0, 10.0, 0.01, samples.size()});
+
+  TEST_ASSERT_TRUE(after_restart.calibration() == CalibrationState{});
+  TEST_ASSERT_FALSE(after_restart.calibration().calibrated);
+  TEST_ASSERT_EQUAL_FLOAT(1.0F, after_restart.calibration().factor);
+  const auto uncalibrated = after_restart.read_current_rms();
+  TEST_ASSERT_TRUE(uncalibrated.has_value());
+  TEST_ASSERT_FLOAT_WITHIN(0.001F, 10.0F, *uncalibrated);
+
+  FakeAdcSampler supplied_sampler(samples.data(), samples.size());
+  CurrentTransformer supplied(supplied_sampler,
+                              {100.0, 10.0, 0.01, samples.size()});
+  supplied.apply_calibration(controller_profile);
+  const auto calibrated = supplied.read_current_rms();
+  TEST_ASSERT_TRUE(calibrated.has_value());
+  TEST_ASSERT_FLOAT_WITHIN(0.001F, 25.0F, *calibrated);
+}
+
+TEST_CASE("current transformer replaces earlier calibration with the latest",
+          "[current_transformer]") {
+  constexpr std::array<std::uint16_t, 2> samples{900, 1100};
+  FakeAdcSampler sampler(samples.data(), samples.size());
+  CurrentTransformer transformer(sampler, {100.0, 10.0, 0.01, samples.size()});
+
+  transformer.apply_calibration({true, 2.0F});
+  transformer.apply_calibration({true, 4.0F});
+  const auto replaced = transformer.read_current_rms();
+  TEST_ASSERT_TRUE(transformer.calibration() == (CalibrationState{true, 4.0F}));
+  TEST_ASSERT_TRUE(replaced.has_value());
+  TEST_ASSERT_FLOAT_WITHIN(0.001F, 40.0F, *replaced);
+
+  FakeAdcSampler reset_sampler(samples.data(), samples.size());
+  CurrentTransformer reset(reset_sampler, {100.0, 10.0, 0.01, samples.size()});
+  reset.apply_calibration({true, 4.0F});
+  reset.apply_calibration({false, 1.0F});
+  const auto unity = reset.read_current_rms();
+  TEST_ASSERT_FALSE(reset.calibration().calibrated);
+  TEST_ASSERT_TRUE(unity.has_value());
+  TEST_ASSERT_FLOAT_WITHIN(0.001F, 10.0F, *unity);
+}
+
+TEST_CASE("current transformer rejects non-finite and negative calibration "
+          "factors and recovers when a valid one is supplied",
+          "[current_transformer]") {
+  constexpr std::array<std::uint16_t, 2> samples{900, 1100};
+  const float invalid_factors[] = {
+      std::numeric_limits<float>::quiet_NaN(),
+      std::numeric_limits<float>::infinity(),
+      -std::numeric_limits<float>::infinity(),
+      -1.0F,
+  };
+
+  for (const float factor : invalid_factors) {
+    FakeAdcSampler sampler(samples.data(), samples.size());
+    CurrentTransformer transformer(sampler,
+                                   {100.0, 10.0, 0.01, samples.size()});
+    transformer.apply_calibration({true, factor});
+
+    TEST_ASSERT_FALSE(transformer.read_current_rms().has_value());
+    TEST_ASSERT_EQUAL_size_t(0, sampler.reads());
+
+    transformer.apply_calibration({true, 2.0F});
+    const auto recovered = transformer.read_current_rms();
+    TEST_ASSERT_TRUE(recovered.has_value());
+    TEST_ASSERT_FLOAT_WITHIN(0.001F, 20.0F, *recovered);
+  }
+}
+
+TEST_CASE("current transformer accepts a small positive calibration "
+          "factor scale",
+          "[current_transformer]") {
+  constexpr std::array<std::uint16_t, 2> samples{900, 1100};
+  FakeAdcSampler sampler(samples.data(), samples.size());
+  CurrentTransformer transformer(sampler, {100.0, 10.0, 0.01, samples.size()});
+  transformer.apply_calibration({true, 0.001F});
+
+  const auto current = transformer.read_current_rms();
+
+  TEST_ASSERT_TRUE(current.has_value());
+  TEST_ASSERT_FLOAT_WITHIN(0.0001F, 0.01F, *current);
+}
+
+TEST_CASE("current transformer reading does not alter supplied calibration",
+          "[current_transformer]") {
+  constexpr std::array<std::uint16_t, 4> samples{900, 1100, 900, 1100};
+  FakeAdcSampler sampler(samples.data(), samples.size());
+  CurrentTransformer transformer(sampler, {100.0, 10.0, 0.01, 2});
+  const CalibrationState supplied{true, 1.5F};
+  transformer.apply_calibration(supplied);
+
+  const auto first = transformer.read_current_rms();
+  const auto second = transformer.read_current_rms();
+
+  TEST_ASSERT_TRUE(first.has_value());
+  TEST_ASSERT_TRUE(second.has_value());
+  TEST_ASSERT_FLOAT_WITHIN(0.001F, 15.0F, *first);
+  TEST_ASSERT_FLOAT_WITHIN(0.001F, 15.0F, *second);
+  TEST_ASSERT_TRUE(transformer.calibration() == supplied);
 }
