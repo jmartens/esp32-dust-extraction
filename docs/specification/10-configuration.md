@@ -109,6 +109,9 @@ and stop values to support hysteresis. Debounce duration and calibration
 values SHALL be configurable per Unit. A profile SHALL be validated before it
 is applied; the Controller SHALL NOT substitute undocumented threshold or
 calibration defaults for missing or invalid values.
+The configured debounce duration SHALL apply independently to demand start
+and stop: the threshold condition MUST remain stable for the full duration
+before the demand state changes. A zero duration disables the delay.
 
 Collector Unit timing configuration SHALL include the automatic start delay.
 The default start delay SHALL be one second; zero SHALL be a valid value to
