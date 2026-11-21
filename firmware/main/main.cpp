@@ -89,7 +89,8 @@ extern "C" void app_main(void) {
             std::chrono::system_clock::now());
       },
       std::chrono::milliseconds{
-          CONFIG_OPEN_EXTRACTION_COLLECTOR_START_DELAY_MS});
+          CONFIG_OPEN_EXTRACTION_COLLECTOR_START_DELAY_MS},
+      std::chrono::milliseconds{CONFIG_OPEN_EXTRACTION_COLLECTOR_RUN_ON_MS});
   static collector_api::CollectorApi api(service);
   static http_server::HttpServer server(
       {.port = static_cast<std::uint16_t>(CONFIG_OPEN_EXTRACTION_HTTP_PORT)},

@@ -27,7 +27,8 @@ public:
                    const collector_unit::ICollectorUnit &unit,
                    event::DeviceUid device_uid,
                    event::EventIdGenerator &id_generator, Clock clock,
-                   std::chrono::milliseconds start_delay = {});
+                   std::chrono::milliseconds start_delay = {},
+                   std::chrono::milliseconds run_on = {});
 
   [[nodiscard]] collector_unit::CollectorState state() const override;
   [[nodiscard]] collector_unit::CollectorMode mode() const override;
@@ -43,7 +44,8 @@ public:
   [[nodiscard]] bool request_mode(collector_unit::CollectorMode mode) override;
 
   // Demand remains observable during an override. Call process() periodically
-  // to release a pending automatic start after the configured delay.
+  // to release a pending automatic start after the configured delay and to
+  // stop the collector once the run-on period after the last demand elapses.
   [[nodiscard]] bool update_demand(bool active);
   [[nodiscard]] bool process();
 
@@ -61,10 +63,13 @@ private:
   event::EventIdGenerator &id_generator_;
   Clock clock_;
   std::chrono::milliseconds start_delay_;
+  std::chrono::milliseconds run_on_;
   collector_unit::CollectorMode mode_ =
       collector_unit::CollectorMode::automatic;
   bool demand_active_ = false;
   std::optional<event::Timestamp> pending_demand_since_;
+  // Set while AUTO output is running with no demand; cleared by new demand.
+  std::optional<event::Timestamp> run_on_since_;
 
   [[nodiscard]] bool reconcile(bool automatic_start_immediate = false);
 };
