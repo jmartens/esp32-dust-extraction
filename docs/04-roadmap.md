@@ -183,6 +183,7 @@ Potential future milestones include:
 * Diagnostics dashboard
 * Historical telemetry
 * Multi-controller support
+* ESP8266 satellite port (see [ADR-0022](adr/0022-supported-hardware-platforms.md))
 
 Future milestones remain intentionally undefined.
 

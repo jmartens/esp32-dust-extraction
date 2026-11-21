@@ -228,7 +228,12 @@ Business logic SHALL NOT:
 * directly manipulate GPIO;
 * perform ESP-NOW operations;
 * access transport implementations;
-* bypass Controller Services.
+* bypass Controller Services;
+* include platform headers such as `esp_*`, `driver/*`, `freertos/*`, `nvs*` or `mbedtls/*`.
+
+Platform specific code belongs in platform adapters behind interfaces, so the
+core can be built for the host and for other targets such as ESP8266
+satellites (see [ADR-0022](docs/adr/0022-supported-hardware-platforms.md)).
 
 The Controller is:
 
