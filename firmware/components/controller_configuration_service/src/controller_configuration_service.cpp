@@ -62,12 +62,10 @@ ConfigurationResult ControllerConfigurationService::apply_machine_unit_profile(
   MachineUnitProfile profile{};
   const ConfigurationResult result =
       load_machine_unit_profile(machine_unit_id, profile);
-  if (result != ConfigurationResult::success) {
-    return result;
+  if (result == ConfigurationResult::success) {
+    demand_source.apply_calibration(profile.calibration);
   }
-
-  demand_source.apply_calibration(profile.calibration);
-  return ConfigurationResult::success;
+  return result;
 }
 
 } // namespace open_extraction::controller_configuration_service

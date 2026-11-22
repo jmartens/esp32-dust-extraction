@@ -28,28 +28,26 @@ public:
   load(const std::string_view machine_unit_id,
        MachineUnitProfile &profile) const override {
     ++load_calls;
-    if (load_result != ProfileStorageResult::success) {
-      return load_result;
+    if (load_result == ProfileStorageResult::success) {
+      const auto stored = profiles.find(std::string(machine_unit_id));
+      if (stored == profiles.end()) {
+        return ProfileStorageResult::not_found;
+      }
+      profile = stored->second;
+      return ProfileStorageResult::success;
     }
-
-    const auto stored = profiles.find(std::string(machine_unit_id));
-    if (stored == profiles.end()) {
-      return ProfileStorageResult::not_found;
-    }
-    profile = stored->second;
-    return ProfileStorageResult::success;
+    return load_result;
   }
 
   [[nodiscard]] ProfileStorageResult
   save(const std::string_view machine_unit_id,
        const MachineUnitProfile &profile) override {
     ++save_calls;
-    if (save_result != ProfileStorageResult::success) {
-      return save_result;
+    if (save_result == ProfileStorageResult::success) {
+      profiles[std::string(machine_unit_id)] = profile;
+      return ProfileStorageResult::success;
     }
-
-    profiles[std::string(machine_unit_id)] = profile;
-    return ProfileStorageResult::success;
+    return save_result;
   }
 
   mutable std::size_t load_calls{};
