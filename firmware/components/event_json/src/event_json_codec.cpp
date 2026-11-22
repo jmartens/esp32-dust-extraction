@@ -30,6 +30,14 @@ EventJsonCodec::serialize(const event::Event &event) {
     return std::nullopt;
   }
 
+  if (const auto unit_id = event.unit_id(); unit_id.has_value()) {
+    const std::string unit_id_string(*unit_id);
+    if (cJSON_AddStringToObject(json.get(), "unit_id",
+                                unit_id_string.c_str()) == nullptr) {
+      return std::nullopt;
+    }
+  }
+
   if (const auto reason = event.fault_reason(); reason.has_value()) {
     const std::string reason_string(*reason);
     if (cJSON_AddStringToObject(json.get(), "reason", reason_string.c_str()) ==

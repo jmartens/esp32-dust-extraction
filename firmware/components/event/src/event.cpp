@@ -131,6 +131,13 @@ std::string_view Event::originating_device() const noexcept {
   return metadata_.originating_device.value();
 }
 
+std::optional<std::string_view> Event::unit_id() const noexcept {
+  if (!metadata_.unit_id.has_value()) {
+    return std::nullopt;
+  }
+  return std::string_view(*metadata_.unit_id);
+}
+
 std::optional<std::string_view> Event::fault_reason() const noexcept {
   return std::nullopt;
 }
