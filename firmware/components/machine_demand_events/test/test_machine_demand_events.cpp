@@ -7,8 +7,8 @@
 
 #include "open_extraction/event_dispatcher/event_dispatcher.hpp"
 #include "open_extraction/event_json/event_json_codec.hpp"
-#include "open_extraction/machine_demand_events/machine_demand_stopped.hpp"
 #include "open_extraction/machine_demand_events/machine_demand_started_emitter.hpp"
+#include "open_extraction/machine_demand_events/machine_demand_stopped.hpp"
 #include "open_extraction/machine_demand_threshold/demand_threshold_evaluator.hpp"
 
 namespace {
@@ -49,8 +49,7 @@ TEST_CASE("a machine demand stopped event identifies its originating unit",
 
   TEST_ASSERT_EQUAL_STRING("ea290ba8-5255-4c7f-9fc6-9a1b94d5a742",
                            event.event_id().data());
-  TEST_ASSERT_EQUAL_STRING("machine_demand.stopped",
-                           event.event_type().data());
+  TEST_ASSERT_EQUAL_STRING("machine_demand.stopped", event.event_type().data());
   TEST_ASSERT_EQUAL_INT64(1'726'258'400'123,
                           event.occurred_at().time_since_epoch().count());
   TEST_ASSERT_EQUAL_STRING("MACHINE-58BF25A77109",
