@@ -11,7 +11,8 @@ out_dir="$PWD/coverage"
 build_dir="${BUILD_DIR:-build}"
 
 idf.py -B "$build_dir" --preview set-target linux || exit 1
-idf.py -B "$build_dir" -DOPEN_EXTRACTION_COVERAGE=ON build || exit 1
+idf.py -B "$build_dir" -DOPEN_EXTRACTION_COVERAGE=ON \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON build || exit 1
 
 python -m pip install --quiet gcovr || exit 1
 
@@ -29,6 +30,7 @@ python -m gcovr --root "$repo_root" --object-directory "$build_dir" \
     --exclude '.*/build/.*' \
     --print-summary \
     --xml "$out_dir/coverage.xml" \
+    --sonarqube "$out_dir/sonarqube.xml" \
     --html-details "$out_dir/index.html" \
     --txt "$out_dir/summary.txt"
 report_status=$?
