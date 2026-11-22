@@ -27,10 +27,13 @@ class TestIds final : public open_extraction::event::EventIdGenerator {
 public:
   EventId generate() override {
     ++count;
-    return EventId::from_string(count == 1
-                                    ? "ea290ba8-5255-4c7f-9fc6-9a1b94d5a742"
-                                    : "ea290ba8-5255-4c7f-9fc6-9a1b94d5a743")
-        .value();
+    const char *value = "ea290ba8-5255-4c7f-9fc6-9a1b94d5a744";
+    if (count == 1) {
+      value = "ea290ba8-5255-4c7f-9fc6-9a1b94d5a742";
+    } else if (count == 2) {
+      value = "ea290ba8-5255-4c7f-9fc6-9a1b94d5a743";
+    }
+    return EventId::from_string(value).value();
   }
   int count = 0;
 };
@@ -127,8 +130,8 @@ TEST_CASE("started is published only on debounced inactive to active changes",
                    DemandTransition::none);
   TEST_ASSERT_TRUE(emitter.evaluate(6.0F, start + 700ms) ==
                    DemandTransition::started);
-  TEST_ASSERT_EQUAL_INT(2, ids.count);
-  TEST_ASSERT_EQUAL_INT(2, clock_calls);
+  TEST_ASSERT_EQUAL_INT(3, ids.count);
+  TEST_ASSERT_EQUAL_INT(3, clock_calls);
   TEST_ASSERT_EQUAL_UINT32(2, events.size());
   TEST_ASSERT_EQUAL_STRING(
       "{\"event_id\":\"ea290ba8-5255-4c7f-9fc6-9a1b94d5a742\","
