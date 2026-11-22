@@ -162,14 +162,51 @@ jobs:
           export-env: false
 
       - name: Run SonarQube Cloud analysis
-        uses: SonarSource/sonarqube-scan-action@59202af334b4ba7b5db01b701b8e79f8b3bef0f4 # v8.5.0
         env:
           SONAR_TOKEN: ${{ steps.sonar-auth.outputs.sonar-token }}
-        with:
-          args: >
-            -Dsonar.organization=${{ steps.sonar-auth.outputs.organization }}
-            -Dsonar.projectKey=${{ steps.sonar-auth.outputs.project-key }}
-            -Dsonar.sources=firmware/components,firmware/main
-            -Dsonar.exclusions=**/test/**,**/build/**,**/managed_components/**
-            -Dsonar.cfamily.compile-commands=firmware/test/build/compile_commands.json
-            -Dsonar.coverageReportPaths=firmware/test/coverage/sonarqube.xml
+          SONAR_ORGANIZATION: ${{ steps.sonar-auth.outputs.organization }}
+          SONAR_PROJECT_KEY: ${{ steps.sonar-auth.outputs.project-key }}
+          SONAR_REGION: ${{ steps.sonar-auth.outputs.sonar-region }}
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.sonar/cache"
+          docker run --rm \
+            -e SONAR_TOKEN \
+            -e SONAR_ORGANIZATION \
+            -e SONAR_PROJECT_KEY \
+            -e SONAR_REGION \
+            -e GITHUB_ACTIONS \
+            -e GITHUB_WORKFLOW \
+            -e GITHUB_RUN_ID \
+            -e GITHUB_RUN_NUMBER \
+            -e GITHUB_RUN_ATTEMPT \
+            -e GITHUB_REPOSITORY \
+            -e GITHUB_REF \
+            -e GITHUB_SHA \
+            -e GITHUB_HEAD_REF \
+            -e GITHUB_BASE_REF \
+            -e GITHUB_EVENT_NAME \
+            -e GITHUB_WORKSPACE=/app/$GITHUB_REPOSITORY \
+            -e GITHUB_EVENT_PATH=/tmp/github-event.json \
+            -v "$GITHUB_WORKSPACE:/app/$GITHUB_REPOSITORY" \
+            -v "$GITHUB_EVENT_PATH:/tmp/github-event.json:ro" \
+            -v "$HOME/.sonar/cache:/root/.sonar/cache" \
+            -w "/app/$GITHUB_REPOSITORY" \
+            espressif/idf:v6.1 \
+            bash -c '
+              set -euo pipefail
+              git config --global --add safe.directory "*"
+              apt-get update
+              apt-get install --yes --no-install-recommends curl default-jre-headless unzip
+              curl --fail --silent --show-error --location \
+                https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-8.4.0.16527-linux-x64.zip \
+                --output /tmp/sonar-scanner.zip
+              unzip -q /tmp/sonar-scanner.zip -d /tmp
+              /tmp/sonar-scanner-8.4.0.16527-linux-x64/bin/sonar-scanner \
+                -Dsonar.organization="$SONAR_ORGANIZATION" \
+                -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
+                -Dsonar.sources=firmware/components,firmware/main \
+                -Dsonar.exclusions="**/test/**,**/build/**,**/managed_components/**" \
+                -Dsonar.cfamily.compile-commands=firmware/test/build/compile_commands.json \
+                -Dsonar.coverageReportPaths=firmware/test/coverage/sonarqube.xml
+            '
