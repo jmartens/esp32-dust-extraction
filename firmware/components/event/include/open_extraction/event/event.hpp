@@ -61,6 +61,7 @@ struct EventMetadata {
   EventType type;
   Timestamp occurred_at;
   DeviceUid originating_device;
+  std::optional<std::string> unit_id{};
 };
 
 class Event {
@@ -75,6 +76,7 @@ public:
   [[nodiscard]] std::string_view event_type() const noexcept;
   [[nodiscard]] Timestamp occurred_at() const noexcept;
   [[nodiscard]] std::string_view originating_device() const noexcept;
+  [[nodiscard]] std::optional<std::string_view> unit_id() const noexcept;
   [[nodiscard]] virtual std::optional<std::string_view>
   fault_reason() const noexcept;
 
