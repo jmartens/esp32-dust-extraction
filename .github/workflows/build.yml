@@ -69,8 +69,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
-      code-quality: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -113,14 +111,57 @@ jobs:
           name: host-test-coverage
           path: firmware/test/coverage/
 
-      - name: Upload coverage report to GitHub Code Quality
+      - name: Analyze coverage with SonarQube Cloud
         if: >-
           success() &&
+          env.SONAR_TOKEN != '' &&
+          vars.SONAR_ORGANIZATION != '' &&
+          vars.SONAR_PROJECT_KEY != '' &&
           (github.event_name != 'pull_request' ||
           github.event.pull_request.head.repo.full_name == github.repository) &&
-          hashFiles('firmware/test/coverage/coverage.xml') != ''
-        uses: actions/upload-code-coverage@2b21a77928be8d5168c2b9581a67f2adbebacc52 # v1
-        with:
-          file: firmware/test/coverage/coverage.xml
-          language: C++
-          label: code-coverage/host-tests
+          hashFiles('firmware/test/coverage/sonarqube.xml') != '' &&
+          hashFiles('firmware/test/build/compile_commands.json') != ''
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+        shell: bash
+        run: |
+          docker run --rm \
+            -e SONAR_TOKEN \
+            -e SONAR_ORGANIZATION \
+            -e SONAR_PROJECT_KEY \
+            -e GITHUB_ACTIONS \
+            -e GITHUB_WORKFLOW \
+            -e GITHUB_RUN_ID \
+            -e GITHUB_RUN_NUMBER \
+            -e GITHUB_RUN_ATTEMPT \
+            -e GITHUB_REPOSITORY \
+            -e GITHUB_REF \
+            -e GITHUB_SHA \
+            -e GITHUB_HEAD_REF \
+            -e GITHUB_BASE_REF \
+            -e GITHUB_EVENT_NAME \
+            -e GITHUB_EVENT_PATH=/tmp/github-event.json \
+            -v "$GITHUB_WORKSPACE:/app/$GITHUB_REPOSITORY" \
+            -v "$GITHUB_EVENT_PATH:/tmp/github-event.json:ro" \
+            -w "/app/$GITHUB_REPOSITORY" \
+            espressif/idf:v6.1 \
+            bash -c '
+              set -euo pipefail
+              git config --global --add safe.directory "*"
+              apt-get update
+              apt-get install --yes --no-install-recommends curl default-jre-headless unzip
+              curl --fail --silent --show-error --location \
+                https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-8.4.0.16527-linux-x64.zip \
+                --output /tmp/sonar-scanner.zip
+              unzip -q /tmp/sonar-scanner.zip -d /tmp
+              /tmp/sonar-scanner-8.4.0.16527-linux-x64/bin/sonar-scanner \
+                -Dsonar.host.url=https://sonarcloud.io \
+                -Dsonar.organization="$SONAR_ORGANIZATION" \
+                -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
+                -Dsonar.sources=firmware/components,firmware/main \
+                -Dsonar.exclusions="**/test/**,**/build/**,**/managed_components/**" \
+                -Dsonar.cfamily.compile-commands=firmware/test/build/compile_commands.json \
+                -Dsonar.coverageReportPaths=firmware/test/coverage/sonarqube.xml
+            '
