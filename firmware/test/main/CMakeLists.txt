@@ -38,6 +38,9 @@ set(EVENT_ID_TEST_DIR
     "${OPEN_EXTRACTION_COMPONENTS_DIR}/event_id_generator/test"
 )
 set(EVENT_JSON_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/event_json/test")
+set(MACHINE_DEMAND_EVENTS_TEST_DIR
+    "${OPEN_EXTRACTION_COMPONENTS_DIR}/machine_demand_events/test"
+)
 set(HTTP_SERVER_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/http_server/test")
 set(HTTP_ROUTES_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/http_routes/test")
 set(RELAY_TEST_DIR "${OPEN_EXTRACTION_COMPONENTS_DIR}/relay/test")
@@ -52,9 +55,6 @@ set(MACHINE_DEMAND_THRESHOLD_TEST_DIR
 )
 set(MACHINE_DEMAND_THRESHOLD_TEST_SOURCE
     "${MACHINE_DEMAND_THRESHOLD_TEST_DIR}/test_demand_threshold_evaluator.cpp"
-)
-set(MACHINE_DEMAND_EVENTS_TEST_DIR
-    "${OPEN_EXTRACTION_COMPONENTS_DIR}/machine_demand_events/test"
 )
 set(MACHINE_DEMAND_STARTED_TEST_SOURCE
     "${MACHINE_DEMAND_EVENTS_TEST_DIR}/test_machine_demand_started.cpp"
@@ -78,6 +78,7 @@ idf_component_register(
         "${EVENT_DISPATCHER_TEST_DIR}/test_event_dispatcher.cpp"
         "${EVENT_ID_TEST_DIR}/test_esp_event_id_generator.cpp"
         "${EVENT_JSON_TEST_DIR}/test_event_json_codec.cpp"
+        "${MACHINE_DEMAND_EVENTS_TEST_DIR}/test_machine_demand_events.cpp"
         "${HTTP_ROUTES_TEST_DIR}/test_http_routes.cpp"
         "${HTTP_SERVER_TEST_DIR}/test_http_server.cpp"
         "${RELAY_TEST_DIR}/test_relay_driver.cpp"
@@ -103,12 +104,12 @@ idf_component_register(
         event_dispatcher
         event_id_generator
         event_json
+        machine_demand_events
         http_routes
         http_server
         machine_demand_source
         current_transformer
         machine_demand_threshold
-        machine_demand_events
         relay
     WHOLE_ARCHIVE
 )

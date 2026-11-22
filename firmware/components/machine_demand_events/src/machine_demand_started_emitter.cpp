@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "open_extraction/machine_demand_events/machine_demand_started.hpp"
+#include "open_extraction/machine_demand_events/machine_demand_stopped.hpp"
 
 namespace open_extraction::machine_demand_events {
 
@@ -24,6 +25,11 @@ MachineDemandStartedEmitter::evaluate(
     const MachineDemandStarted started(id_generator_.generate(), clock_(),
                                        device_uid_, unit_id_);
     dispatcher_.publish(started);
+  } else if (transition ==
+             machine_demand_threshold::DemandTransition::stopped) {
+    const MachineDemandStopped stopped(id_generator_.generate(), clock_(),
+                                       device_uid_, unit_id_);
+    dispatcher_.publish(stopped);
   }
   return transition;
 }
