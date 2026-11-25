@@ -36,7 +36,9 @@ continues to report active demand with `demand_active: true` and
 starts the collector when demand is already active. New demand observed while
 already in AUTO waits for the configured service start delay. Demand producers
 feed updates through `CollectorService::update_demand()`; call
-`CollectorService::process()` periodically to evaluate a pending start.
+`CollectorService::process()` periodically to evaluate a pending start or
+the run-on stop. In AUTO, the collector keeps running for the configured
+run-on period after the last demand ends; new demand cancels the pending stop.
 For the relay-backed Collector Unit, these states describe the commanded
 relay/output state. `running` means the relay has been commanded on; it does
 not confirm that the motor is physically running because no motor-feedback
@@ -57,6 +59,7 @@ Configure the relay under **Open Extraction** in `idf.py menuconfig`:
 | Collector relay GPIO pin | GPIO 26 | Output pin connected to the relay |
 | Collector relay polarity | Active high | Select active high or active low |
 | Collector automatic start delay | 1000 ms | Delay for new demand while already in AUTO; returning to AUTO with active demand starts immediately |
+| Collector run-on duration | 10000 ms | How long AUTO keeps the collector running after the last demand ends; 0 stops immediately |
 
 Choose an output-capable pin that is not reserved by the board or flash
 interface. The ESP relay driver presets the GPIO's off level before enabling

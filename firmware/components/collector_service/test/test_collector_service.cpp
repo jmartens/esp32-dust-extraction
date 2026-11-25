@@ -100,11 +100,12 @@ struct Fixture {
         });
   }
 
-  CollectorService service(std::chrono::milliseconds start_delay = {}) {
+  CollectorService service(std::chrono::milliseconds start_delay = {},
+                           std::chrono::milliseconds run_on = {}) {
     return CollectorService(
         dispatcher, event_dispatcher, unit,
         DeviceUid::from_string(std::string(kUid)).value(), ids,
-        [this] { return now; }, start_delay);
+        [this] { return now; }, start_delay, run_on);
   }
 };
 
@@ -359,5 +360,125 @@ TEST_CASE("released automatic demand cancels a pending delayed start",
 
   TEST_ASSERT_FALSE(service.demand_active());
   TEST_ASSERT_FALSE(service.demand_suppressed());
+  TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
+}
+
+TEST_CASE("zero start delay starts new automatic demand immediately",
+          "[collector_service]") {
+  Fixture f;
+  CollectorService service = f.service(std::chrono::milliseconds::zero());
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StartCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+}
+
+TEST_CASE("negative start delay is clamped to no delay",
+          "[collector_service]") {
+  Fixture f;
+  CollectorService service = f.service(std::chrono::milliseconds(-250));
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+}
+
+TEST_CASE("run-on keeps the collector running until the period elapses",
+          "[collector_service]") {
+  Fixture f;
+  f.unit.current = CollectorState::running;
+  CollectorService service =
+      f.service(std::chrono::milliseconds{}, std::chrono::milliseconds(10'000));
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  TEST_ASSERT_TRUE(service.update_demand(false));
+  f.now += std::chrono::milliseconds(9'999);
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
+
+  f.now += std::chrono::milliseconds(1);
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StopCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+}
+
+TEST_CASE("new demand cancels a pending run-on stop", "[collector_service]") {
+  Fixture f;
+  f.unit.current = CollectorState::running;
+  CollectorService service =
+      f.service(std::chrono::milliseconds{}, std::chrono::milliseconds(10'000));
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  TEST_ASSERT_TRUE(service.update_demand(false));
+  f.now += std::chrono::milliseconds(5'000);
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  f.now += std::chrono::milliseconds(60'000);
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
+
+  // The run-on period restarts from the next demand release.
+  TEST_ASSERT_TRUE(service.update_demand(false));
+  f.now += std::chrono::milliseconds(9'999);
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
+  f.now += std::chrono::milliseconds(1);
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+}
+
+TEST_CASE("run-on starts only after the last demand is removed",
+          "[collector_service]") {
+  Fixture f;
+  f.unit.current = CollectorState::running;
+  CollectorService service =
+      f.service(std::chrono::milliseconds{}, std::chrono::milliseconds(1'000));
+
+  // The service sees aggregated demand: it stays active while any unit is on.
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  f.now += std::chrono::milliseconds(5'000);
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
+
+  TEST_ASSERT_TRUE(service.update_demand(false));
+  f.now += std::chrono::milliseconds(1'000);
+  TEST_ASSERT_TRUE(service.process());
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+}
+
+TEST_CASE("zero run-on stops immediately when demand ends",
+          "[collector_service]") {
+  Fixture f;
+  f.unit.current = CollectorState::running;
+  CollectorService service = f.service();
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  TEST_ASSERT_TRUE(service.update_demand(false));
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StopCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+}
+
+TEST_CASE("run-on does not apply to forced modes", "[collector_service]") {
+  Fixture f;
+  f.unit.current = CollectorState::running;
+  CollectorService service =
+      f.service(std::chrono::milliseconds{}, std::chrono::milliseconds(10'000));
+
+  TEST_ASSERT_TRUE(service.update_demand(true));
+  TEST_ASSERT_TRUE(service.request_mode(CollectorMode::forced_off));
+  TEST_ASSERT_EQUAL_UINT(1, f.received_types.size());
+  TEST_ASSERT_EQUAL_STRING(std::string(StopCollector::kCommandType).c_str(),
+                           f.received_types[0].c_str());
+
+  f.unit.current = CollectorState::running;
+  f.received_types.clear();
+  TEST_ASSERT_TRUE(service.request_mode(CollectorMode::forced_on));
+  TEST_ASSERT_TRUE(service.update_demand(false));
+  f.now += std::chrono::milliseconds(60'000);
+  TEST_ASSERT_TRUE(service.process());
   TEST_ASSERT_EQUAL_UINT(0, f.received_types.size());
 }
